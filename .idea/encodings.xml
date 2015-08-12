@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/app/src/main/java/za/co/proteacoin/procurementandroid/DBAdapter.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/za/co/proteacoin/procurementandroid/DisplayRemoteFile.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/za/co/proteacoin/procurementandroid/GlobalState.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/za/co/proteacoin/procurementandroid/ServiceHandler.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/za/co/proteacoin/procurementandroid/ShowAttachedDocuments_Activity.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/za/co/proteacoin/procurementandroid/ShowDetail_Activity.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/za/co/proteacoin/procurementandroid/ShowGrid_Activity.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/za/co/proteacoin/procurementandroid/ShowRequisitionLines_Activity.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/attachedocuments.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/buttonshape.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/logo.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/mainlogo.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/requisitionlist.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/attached_document_line.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/main.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/mylist.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/myprogressdialog.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/requisition.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/requisition_line.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/show_attached_document_lines.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/show_requisition_lines.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/showdetail.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/showgrid.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/spinner_item.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/attacheddocuments.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/logo.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/mainlogo.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/requisitionlist.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/attacheddocuments.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/mainlogo.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/requisitionlist.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/attacheddocuments.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/logo.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/mainlogo.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/requisitionlist.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/attacheddocuments.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/logo.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/mainlogo.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/requisitionlist.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/values/strings.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/values/style.xml" charset="windows-1252" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>

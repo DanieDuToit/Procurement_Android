@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+    <!-- RequisitionId -->
+    <TextView
+            style="@style/H2"
+            android:paddingBottom="2dip"
+            android:id="@+id/lblRequisitionId"
+            android:text="RequisitionId:"/>
+    <TextView
+            style="@style/input_field"
+            android:id="@+id/tvRequisitionId"
+            android:layout_width="fill_parent"
+            android:paddingBottom="2dip"
+            android:layout_alignBaseline="@+id/lblRequisitionId"
+            android:text="Requisition ID" android:layout_alignEnd="@+id/tvSupplierCardName"
+            android:layout_alignStart="@+id/tvSupplierCardName"/>
+
+    <!-- SupplierCardCode -->
+    <TextView
+            style="@style/H2"
+            android:paddingBottom="2dip"
+            android:id="@+id/lblSupplierCardCode"
+            android:layout_below="@+id/lblRequisitionId"
+            android:text="Supplier Code:"/>
+    <TextView
+            style="@style/input_field"
+            android:id="@+id/tvSupplierCardCode"
+            android:layout_width="fill_parent"
+            android:paddingBottom="2dip"
+            android:layout_alignBaseline="@+id/lblSupplierCardCode"
+            android:text="Supplier Code"
+            android:layout_alignEnd="@+id/tvRequisitionId" android:layout_alignStart="@+id/tvSupplierCardName"/>
+
+    <!-- SupplierCardName -->
+    <TextView
+            style="@style/H2"
+            android:paddingBottom="2dip"
+            android:id="@+id/lblSupplierCardName"
+            android:layout_below="@+id/lblSupplierCardCode"
+            android:text="Supplier Name:"/>
+    <TextView
+            style="@style/input_field"
+            android:id="@+id/tvSupplierCardName"
+            android:layout_width="fill_parent"
+            android:text="Supplier Name: "
+            android:layout_toRightOf="@id/lblSupplierCardName"
+            android:layout_alignBaseline="@+id/lblSupplierCardName"/>
+</RelativeLayout>

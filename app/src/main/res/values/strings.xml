@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Procurement</string>
+    <string name="loginPrompt">Please login to continue.</string>
+    <string name="userName">Username:</string>
+    <string name="password">Password:</string>
+    <string name="companyName">Company Name:</string>
+    <string name="login">Login</string>
+    <string name="action_settings">Main Menu</string>
+    <string name="server_unregistered">Google Server: successfully removed device!</string>
+    <string name="server_unregister_error">Could not unregister device on Google Server (%1$s).</string>
+    <string name="gcm_unregistered">Google Server: successfully removed device!</string>
+    <string name="gcm_deleted">GCM: server deleted %1$d pending messages!</string>
+    <string name="gcm_error">GCM: error (%1$s).</string>
+    <string name="gcm_recoverable_error">GCM: recoverable error (%1$s).</string>
+</resources>

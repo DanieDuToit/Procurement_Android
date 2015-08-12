@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:weightSum="100">
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Filter:"
+            android:layout_weight="40"
+            android:textSize="25sp"/>
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="20"
+            android:id="@+id/etFilter"/>
+        <Button
+                android:background="@drawable/buttonshape"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                style="@style/H2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Filter"
+            android:layout_weight="40"
+            android:id="@+id/btnFilter"/>
+    </LinearLayout>
+    <View style="@style/Divider" />
+
+    <ListView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@android:id/list"/>
+
+</LinearLayout>

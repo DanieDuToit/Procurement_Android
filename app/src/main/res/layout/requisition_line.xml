@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+    <!-- ItemDescription -->
+    <TextView
+        style="@style/H2"
+        android:id="@+id/lbLineNumber"
+        android:text="Line #:"/>
+
+    <TextView
+        style="@style/input_field"
+        android:id="@+id/tvLineNumber"
+        android:layout_toRightOf="@+id/lbLineNumber"
+        android:layout_alignBaseline="@+id/lbLineNumber"
+        android:paddingBottom="2dip"
+        android:paddingLeft="3dip"
+        android:text="#"/>
+
+    <!-- ItemDescription -->
+    <TextView
+        style="@style/H2"
+        android:id="@+id/lblItemDescription"
+        android:layout_toRightOf="@+id/tvLineNumber"
+        android:layout_alignBaseline="@+id/lbLineNumber"
+        android:paddingLeft="7dip"
+        android:text="Item Description:"/>
+
+    <TextView
+        style="@style/input_field"
+        android:id="@+id/tvItemDescription"
+        android:layout_alignBaseline="@+id/lbLineNumber"
+        android:layout_toRightOf="@+id/lblItemDescription"
+        android:paddingBottom="2dip"
+        android:paddingLeft="3dip"
+        android:text="Requisition ID"/>
+
+    <!-- AccCode -->
+    <TextView
+        style="@style/H2"
+        android:id="@+id/lblAccCode"
+        android:layout_below="@+id/lblItemDescription"
+        android:text="G/L Account Code:"
+        />
+
+    <TextView
+        style="@style/input_field"
+        android:id="@+id/tvAccCode"
+        android:layout_width="fill_parent"
+        android:layout_alignBaseline="@+id/lblAccCode"
+        android:layout_toRightOf="@id/lblAccCode"
+        android:paddingBottom="2dip"
+        android:paddingLeft="3dip"
+        android:text="GL Acc  Code"/>
+
+    <!-- LineQuantity -->
+    <TextView
+        style="@style/H2"
+        android:id="@+id/lblQuantity"
+        android:layout_below="@+id/lblAccCode"
+        android:text="Quantity: "/>
+
+    <TextView
+        style="@style/input_field"
+        android:id="@+id/tvQuantity"
+        android:layout_alignBaseline="@+id/lblQuantity"
+        android:layout_toRightOf="@id/lblQuantity"
+        android:gravity="left"
+        android:paddingLeft="3dip"
+        android:text="quantity"/>
+
+    <!-- LineQuantity -->
+    <TextView
+        style="@style/H2"
+        android:id="@+id/lblTotal"
+        android:layout_alignBaseline="@+id/lblQuantity"
+        android:layout_below="@+id/lblAccCode"
+        android:layout_toRightOf="@+id/tvQuantity"
+        android:paddingLeft="8dip"
+        android:text="LineTotal: R"/>
+
+    <TextView
+        style="@style/input_field"
+        android:id="@+id/tvLineTotal"
+        android:layout_alignBaseline="@+id/lblQuantity"
+        android:layout_toRightOf="@id/lblTotal"
+        android:gravity="left"
+        android:paddingLeft="3dip"
+        android:text="Total"/>
+
+</RelativeLayout>

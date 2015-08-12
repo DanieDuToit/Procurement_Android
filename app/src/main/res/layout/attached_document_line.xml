@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+    <TextView
+        style="@style/H2"
+        android:id="@+id/lblAttachedDocument"
+        android:text="Document Name:"/>
+
+    <TextView
+        style="@style/input_field"
+        android:id="@+id/tvAttachedDocument"
+        android:layout_toRightOf="@+id/lblAttachedDocument"
+        android:layout_alignBaseline="@+id/lblAttachedDocument"
+        android:paddingBottom="2dip"
+        android:paddingLeft="3dip"
+        android:text="Document Name"
+        android:textStyle="bold" android:lines="1" android:layout_alignParentEnd="true"/>
+
+    <TextView
+        android:id="@+id/tvRequisitionDocumentId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="hidden"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/tvDocumentMimeType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="hidden"
+        android:visibility="invisible"/>
+
+</RelativeLayout>
