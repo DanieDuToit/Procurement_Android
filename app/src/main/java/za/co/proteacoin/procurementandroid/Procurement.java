@@ -1,4 +1,5 @@
 package za.co.proteacoin.procurementandroid;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -8,12 +9,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -54,6 +60,7 @@ public class Procurement extends Activity {
     boolean loginSuccessFull = false;
     SharedPreferences sharedPref;
     GoogleCloudMessaging gcm;
+    int numberrOfSecurityIDViews = -1;
     // Hashmap for ListView
     ArrayList<HashMap<String, String>> resultList;
     // Requisition's JSONArray
@@ -111,6 +118,7 @@ public class Procurement extends Activity {
         gs.setIvKey(sharedPref.getString("IVKey", ""));
         gs.setGcmIdentification(sharedPref.getString("GCMIdentification", ""));
         final String uniqueDeviceID = sharedPref.getString("UniqueDeviceID", "");
+        numberrOfSecurityIDViews = sharedPref.getInt("NumberrOfSecurityIDViews", 0);
 
         // Create editor for editing Preferences
         SharedPreferences.Editor edit = sharedPref.edit();
@@ -158,6 +166,21 @@ public class Procurement extends Activity {
         registerReceiver(mHandleMessageReceiver, new IntentFilter(
                 GCMConfig.DISPLAY_MESSAGE_ACTION));
 
+        // Get the version number
+        String versionName = "";
+        try {
+            final PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionName = packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        // Display the version number in the ActionBar
+        ActionBar ab = getActionBar();
+        if (ab != null)
+            ab.setTitle("Procurement. Version: " + versionName);
+
+
         try {
             CryptLib _crypt = new CryptLib();
             String output = "";
@@ -176,8 +199,6 @@ public class Procurement extends Activity {
         companyList = new HashMap<String, Integer>();
 
         setContentView(R.layout.main);
-
-        getActionBar().setTitle("Procurement");
 
         assets = getAssets();
         packageName = getPackageName();
@@ -263,8 +284,8 @@ public class Procurement extends Activity {
                                 public void onClick(DialogInterface dialog, int which) {
                                     android.os.Process.killProcess(android.os.Process.myPid());
                                     System.exit(1);
-                                }
-                            })
+                }
+            })
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .show();
                 }
@@ -272,6 +293,40 @@ public class Procurement extends Activity {
         }, 60000);
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.action_settings:
+//                Intent setupGCMIntent = new Intent("android.intent.action.GCMRegisterActivity");
+//                startActivity(setupGCMIntent);
+                return true;
+            case R.id.showIVKey:
+                // TODO Remove the below
+                numberrOfSecurityIDViews = 0;
+                if (++numberrOfSecurityIDViews > 2) {
+                    // Only 3 attempts allowed to view the security code
+                    return true;
+                }
+                sharedPref = Procurement.this.getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences.Editor edit = sharedPref.edit();
+                edit.putInt("NumberrOfSecurityIDViews", numberrOfSecurityIDViews);
+                // Apply changes to Preferences
+                edit.apply();
+                gs.showAlertDialog(Procurement.this, "You have only " + (2 - numberrOfSecurityIDViews) + " chance left to view your Security Code", gs.getIvKey(), false);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
     /**
      * Async task class to get json by making HTTP call
      */

@@ -13,10 +13,11 @@
         <item name="android:background">@color/custom_bg_color</item>
     </style>
 
-    <style name="CustomTheme" parent="android:Theme.DeviceDefault.Light.DarkActionBar">
+    <style name="CustomTheme" parent="@android:style/Theme.Holo.Light">
         <item name="android:windowBackground">@color/custom_bg_color</item>
         <item name="android:colorBackground">@color/custom_bg_color</item>
         <item name="android:textColor">@color/custom_txt_color</item>
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
     </style>
 
     <style name="H1">
@@ -67,5 +68,33 @@
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">20sp</item>
     </style>
+
+
+    <style name="MyActionBar" parent="@android:style/Widget.Holo.ActionBar">
+        <item name="android:titleTextStyle">@style/MyActionBar.TitleTextStyle</item>
+        <item name="android:actionMenuTextAppearance">@style/MyActionBar.MenuTextStyle</item>
+    </style>
+
+    <style name="MyActionBar.TitleTextStyle"
+           parent="android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/custom_txt_color</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="MyActionBar.MenuTextStyle"
+           parent="android:style/TextAppearance.Holo.Widget.ActionBar.Menu">
+        <item name="android:textColor">@color/custom_txt_color</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
 </resources>
 
+<!--<resources>-->
+<!--&lt;!&ndash; Base application theme. &ndash;&gt;-->
+<!--<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
+    <!--&lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+<!--</style>-->
+
+<!--</resources>-->

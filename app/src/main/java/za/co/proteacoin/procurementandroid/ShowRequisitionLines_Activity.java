@@ -40,6 +40,8 @@ public class ShowRequisitionLines_Activity extends ListActivity {
 	private static final String TAG_QUANTITY = "Quantity";
 	private static final String TAG_LINETOTAL = "LineTotal";
 	private static final String TAG_DATA = "requisitionLines";
+	private boolean hasError = false;
+	private String ErrorMessage = "";
 	// Requisition's JSONArray
 	JSONArray data = null;
 	private ProgressDialog pDialog;
@@ -97,7 +99,7 @@ public class ShowRequisitionLines_Activity extends ListActivity {
 
 		@Override
 		protected Void doInBackground(Void... voids) {
-			String url = gs.getInternetURL() + "RequisitionJsons.php?functionName=getRequisitionLines";
+			String url = GlobalState.getInternetURL() + "RequisitionJsons.php?functionName=getRequisitionLines";
 			// Creating service handler class instance
 			ServiceHandler sh = new ServiceHandler();
 
@@ -112,28 +114,19 @@ public class ShowRequisitionLines_Activity extends ListActivity {
 				try {
 					JSONObject jsonObj = new JSONObject(jsonStr);
 
-					// Check if there was an error
-					boolean response = jsonObj.getBoolean("responseOK");
-					if (!response) {
-						// Handle error
-						String errorMsg = jsonObj.getString("responseMessage");
-						new AlertDialog.Builder(ShowRequisitionLines_Activity.this)
-								.setTitle("Error")
-								.setMessage("The following message occured while trying to retrieve the requisition detail: " + errorMsg)
-								.setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int which) {
-										android.os.Process.killProcess(android.os.Process.myPid());
-										System.exit(1);
-									}
-								})
-								.setIcon(android.R.drawable.ic_dialog_alert)
-								.show();
-
-						return null;
-					}
-
 					// Getting JSON Array node
 					data = jsonObj.getJSONArray(TAG_DATA);
+
+					// Check for error
+					JSONObject jo = data.getJSONObject(0);
+					try {
+						String error = jo.getString("Error");
+						hasError = true;
+						ErrorMessage = "The following message occured while trying to retrieve the requisition detail: \n" + error;
+						return null;
+					} catch (Exception e) {
+						// Intentially left blank
+					}
 
 					// looping through All Contacts
 					for (int i = 0; i < data.length(); i++) {
@@ -194,6 +187,22 @@ public class ShowRequisitionLines_Activity extends ListActivity {
 			if (pDialog.isShowing()) {
 				pDialog.dismiss();
 			}
+
+			if (hasError) {
+				hasError = false;
+				new AlertDialog.Builder(ShowRequisitionLines_Activity.this)
+						.setTitle("Error")
+						.setMessage(ErrorMessage)
+						.setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								android.os.Process.killProcess(android.os.Process.myPid());
+								System.exit(0);
+							}
+						})
+						.setIcon(android.R.drawable.ic_dialog_alert)
+						.show();
+			}
+
 			/**
 			 * Updating parsed JSON data into ListView
 			 * */

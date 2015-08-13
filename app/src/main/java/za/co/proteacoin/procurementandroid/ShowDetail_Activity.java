@@ -81,6 +81,8 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
     private String url = "";
     private ProgressDialog pDialog;
     private boolean updateSuccessFull = false;
+    private boolean hasError = false;
+    private String ErrorMessage = "";
 
     // for JSON
     @Override
@@ -238,6 +240,7 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
                 startActivity(iShowReqLines);
                 break;
             case R.id.approveIt:
+                comment = etComment.getText().toString();
                 final UpdateApproval downloader = new UpdateApproval();
                 downloader.execute();
                 Handler handler = new Handler();
@@ -296,7 +299,7 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
         @Override
         protected Void doInBackground(Void... params) {
             // Get Requisition detail
-            url = gs.getInternetURL() + "RequisitionJsons.php?functionName=getRequisitionDetail";
+            url = GlobalState.getInternetURL() + "RequisitionJsons.php?functionName=getRequisitionDetail";
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
 
@@ -352,7 +355,7 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
 
             // ********************************************************************
             // Get Approvers List
-            url = gs.getInternetURL() + "RequisitionJsons.php?functionName=getApprovers";
+            url = GlobalState.getInternetURL() + "RequisitionJsons.php?functionName=getApprovers";
             // Creating service handler class instance
             sh = new ServiceHandler();
 
@@ -374,7 +377,7 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
                         String errorMsg = jsonObj.getString("responseMessage");
                         new AlertDialog.Builder(ShowDetail_Activity.this)
                                 .setTitle("Error")
-                                .setMessage("The following message occured while trying to retrieve the requisition detail: " + errorMsg)
+                                .setMessage("The following eror occured while trying to retrieve the requisition detail: " + errorMsg)
                                 .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         android.os.Process.killProcess(android.os.Process.myPid());
@@ -388,6 +391,17 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
                     }
 
                     data = jsonObj.getJSONArray(TAG_APPROVERS);
+
+                    // Check for error
+                    JSONObject jo = data.getJSONObject(0);
+                    try {
+                        String error = jo.getString("Error");
+                        hasError = true;
+                        ErrorMessage = "The following message occured while trying to retrieve the requisition detail: \n" + error;
+                        return null;
+                    } catch (Exception e) {
+                        // Intentially left blank
+                    }
 
                     // looping through All Approvers
                     for (int i = 0; i < data.length(); i++) {
@@ -433,6 +447,21 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
                 pDialog.dismiss();
             }
 
+            if (hasError) {
+                hasError = false;
+                new AlertDialog.Builder(ShowDetail_Activity.this)
+                        .setTitle("Error")
+                        .setMessage(ErrorMessage)
+                        .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                android.os.Process.killProcess(android.os.Process.myPid());
+                                System.exit(0);
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+
             tvSupp_name.setText(SupplierCardName);
             tvSupp_contact_name.setText(SupplierContactName);
             tvSupp_contact_telephone.setText(SupplierTelephone);
@@ -453,12 +482,12 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
 
-            url = gs.getInternetURL() + "RequisitionJsons.php?functionName=requsitionIterationsaveOption";
+            url = GlobalState.getInternetURL() + "RequisitionJsons.php?functionName=requsitionIterationsaveOption";
 
             // Making a request to url and getting response
             List<NameValuePair> queryParams = new ArrayList<NameValuePair>();
             queryParams.add(new BasicNameValuePair("requisitionId", gs.getRequisitionId()));
-            queryParams.add(new BasicNameValuePair("iterationComments", etComment.getText().toString()));
+            queryParams.add(new BasicNameValuePair("iterationComments", comment));
             queryParams.add(new BasicNameValuePair("approvedBy", gs.getSystemUserId()));
             queryParams.add(new BasicNameValuePair("requisitionSaveOption", String.valueOf(selectedAction)));
             if (selectedAction == SaveActions.SENDFORAPPROVAL.getNumericType())

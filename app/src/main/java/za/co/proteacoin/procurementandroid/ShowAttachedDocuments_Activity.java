@@ -37,6 +37,8 @@ public class ShowAttachedDocuments_Activity extends ListActivity {
 	private static final String TAG_REQUISITIONDOCUMENTID = "RequisitionDocumentId";
 	private static final String TAG_DOCUMENTMIMETYPE = "DocumentMimeType";
 	private static final String TAG_DATA = "requisitionDocuments";
+	private boolean hasError = false;
+	private String ErrorMessage = "";
 	// Requisition's JSONArray
 	JSONArray data = null;
 	private ProgressDialog pDialog;
@@ -114,7 +116,7 @@ public class ShowAttachedDocuments_Activity extends ListActivity {
 	private class GetAttachedDocumentsLines extends AsyncTask<Void, Void, Void> {
 		@Override
 		protected Void doInBackground(Void... voids) {
-			String url = gs.getInternetURL() + "RequisitionJsons.php?functionName=getAttachedDocuments";
+			String url = GlobalState.getInternetURL() + "RequisitionJsons.php?functionName=getAttachedDocuments";
 			// Creating service handler class instance
 			ServiceHandler sh = new ServiceHandler();
 
@@ -136,7 +138,7 @@ public class ShowAttachedDocuments_Activity extends ListActivity {
 						String errorMsg = jsonObj.getString("responseMessage");
 						new AlertDialog.Builder(ShowAttachedDocuments_Activity.this)
 								.setTitle("Error")
-								.setMessage("The following message occured while trying to retrieve the requisition detail: " + errorMsg)
+								.setMessage("The following message occured while trying to retrieve Attachment file names: " + errorMsg)
 								.setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int which) {
 										android.os.Process.killProcess(android.os.Process.myPid());
@@ -151,6 +153,16 @@ public class ShowAttachedDocuments_Activity extends ListActivity {
 
 					// Getting JSON Array node
 					data = jsonObj.getJSONArray(TAG_DATA);
+					// Check for error
+					JSONObject jo = data.getJSONObject(0);
+					try {
+						String error = jo.getString("Error");
+						hasError = true;
+						ErrorMessage = "The following message occured while trying to retrieve Attachment file names: \n" + error;
+						return null;
+					} catch (Exception e) {
+						// Intentially left blank
+					}
 
 					// looping through All Contacts
 					for (int i = 0; i < data.length(); i++) {
@@ -198,6 +210,22 @@ public class ShowAttachedDocuments_Activity extends ListActivity {
 			if (pDialog.isShowing()) {
 				pDialog.dismiss();
 			}
+
+			if (hasError) {
+				hasError = false;
+				new AlertDialog.Builder(ShowAttachedDocuments_Activity.this)
+						.setTitle("Error")
+						.setMessage(ErrorMessage)
+						.setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								android.os.Process.killProcess(android.os.Process.myPid());
+								System.exit(0);
+							}
+						})
+						.setIcon(android.R.drawable.ic_dialog_alert)
+						.show();
+			}
+
 			/**
 			 * Updating parsed JSON data into ListView
 			 * */

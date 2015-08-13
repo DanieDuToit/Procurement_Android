@@ -13,4 +13,5 @@
     <string name="gcm_deleted">GCM: server deleted %1$d pending messages!</string>
     <string name="gcm_error">GCM: error (%1$s).</string>
     <string name="gcm_recoverable_error">GCM: recoverable error (%1$s).</string>
+    <string name="DisplayIVKey">Your Identification Key</string>
 </resources>

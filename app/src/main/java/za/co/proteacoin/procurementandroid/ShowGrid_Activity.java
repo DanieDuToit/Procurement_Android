@@ -32,6 +32,9 @@ public class ShowGrid_Activity extends ListActivity implements View.OnClickListe
 	private static final String TAG_SUPPLIERCARDNAME = "SupplierCardName";
 	private String url = "";
 	private static final String TAG_DATA = "requisitions";
+	private boolean hasError = false;
+	private String ErrorMessage = "";
+	private String filter = "";
 	// Hashmap for ListView
 	ArrayList<HashMap<String, String>> requisitionList;
 	// Requisition's JSONArray
@@ -46,6 +49,7 @@ public class ShowGrid_Activity extends ListActivity implements View.OnClickListe
 	public void onClick(View v) {
 		switch (v.getId()) {
 			case R.id.btnFilter:
+				filter = etFilter.getText().toString();
 				requisitionList.clear();
 				final GetRequisitions downloader = new GetRequisitions();
 				downloader.execute();
@@ -215,13 +219,13 @@ public class ShowGrid_Activity extends ListActivity implements View.OnClickListe
 
 		@Override
 		protected Void doInBackground(Void... arg0) {
-			url = gs.getInternetURL() + "RequisitionJsons.php?functionName=getRequisitions";
+			url = GlobalState.getInternetURL() + "RequisitionJsons.php?functionName=getRequisitions";
 //			url = gs.getInternetURL() + "GetRequisitions.php";
 			// Creating service handler class instance
 			ServiceHandler sh = new ServiceHandler();
 
 			List<NameValuePair> queryParams = new ArrayList<NameValuePair>();
-			queryParams.add(new BasicNameValuePair("filter", etFilter.getText().toString()));
+			queryParams.add(new BasicNameValuePair("filter", filter));
 			queryParams.add(new BasicNameValuePair("CurrentSapDatabaseId", gs.getCompanyDatabase().toString()));
 
 			String jsonStr = sh.makeServiceCall(url, ServiceHandler.POST, queryParams);
@@ -252,6 +256,17 @@ public class ShowGrid_Activity extends ListActivity implements View.OnClickListe
 
 					// Getting JSON Array node
 					data = jsonObj.getJSONArray(TAG_DATA);
+
+					// Check for error
+					JSONObject jo = data.getJSONObject(0);
+					try {
+						String error = jo.getString("Error");
+						hasError = true;
+						ErrorMessage = "The following message occured while trying to retrieve a list of requisitions: \n" + error;
+						return null;
+					} catch (Exception e) {
+						// Intentially left blank
+					}
 
 					// looping through All Contacts
 					for (int i = 0; i < data.length(); i++) {
@@ -287,6 +302,22 @@ public class ShowGrid_Activity extends ListActivity implements View.OnClickListe
 			if (pDialog.isShowing()) {
 				pDialog.dismiss();
 			}
+
+			if (hasError) {
+				hasError = false;
+				new AlertDialog.Builder(ShowGrid_Activity.this)
+						.setTitle("Error")
+						.setMessage(ErrorMessage)
+						.setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								android.os.Process.killProcess(android.os.Process.myPid());
+								System.exit(0);
+							}
+						})
+						.setIcon(android.R.drawable.ic_dialog_alert)
+						.show();
+			}
+
 			/**
 			 * Updating parsed JSON data into ListView
 			 * */
