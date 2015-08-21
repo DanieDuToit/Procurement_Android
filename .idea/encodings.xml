@@ -12,7 +12,7 @@
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/attachedocuments.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/buttonshape.xml" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/logo.png" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/mainlogo.png" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/logoicon.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/requisitionlist.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/attached_document_line.xml" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/main.xml" charset="windows-1252" />
@@ -27,18 +27,14 @@
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/spinner_item.xml" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/attacheddocuments.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/logo.png" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/mainlogo.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/requisitionlist.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/attacheddocuments.png" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/mainlogo.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/requisitionlist.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/attacheddocuments.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/logo.png" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/mainlogo.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/requisitionlist.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/attacheddocuments.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/logo.png" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/mainlogo.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/requisitionlist.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/values/strings.xml" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/values/style.xml" charset="windows-1252" />

@@ -116,7 +116,7 @@ public class ShowAttachedDocuments_Activity extends ListActivity {
 	private class GetAttachedDocumentsLines extends AsyncTask<Void, Void, Void> {
 		@Override
 		protected Void doInBackground(Void... voids) {
-			String url = GlobalState.getInternetURL() + "RequisitionJsons.php?functionName=getAttachedDocuments";
+			String url = GlobalState.INTERNET_URL + "RequisitionJsons.php?functionName=getAttachedDocuments";
 			// Creating service handler class instance
 			ServiceHandler sh = new ServiceHandler();
 
@@ -131,34 +131,15 @@ public class ShowAttachedDocuments_Activity extends ListActivity {
 				try {
 					JSONObject jsonObj = new JSONObject(jsonStr);
 
-					// Check if there was an error
-					boolean response = jsonObj.getBoolean("responseOK");
-					if (!response) {
-						// Handle error
-						String errorMsg = jsonObj.getString("responseMessage");
-						new AlertDialog.Builder(ShowAttachedDocuments_Activity.this)
-								.setTitle("Error")
-								.setMessage("The following message occured while trying to retrieve Attachment file names: " + errorMsg)
-								.setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int which) {
-										android.os.Process.killProcess(android.os.Process.myPid());
-										System.exit(1);
-									}
-								})
-								.setIcon(android.R.drawable.ic_dialog_alert)
-								.show();
-
-						return null;
-					}
-
 					// Getting JSON Array node
 					data = jsonObj.getJSONArray(TAG_DATA);
+
 					// Check for error
 					JSONObject jo = data.getJSONObject(0);
 					try {
 						String error = jo.getString("Error");
 						hasError = true;
-						ErrorMessage = "The following message occured while trying to retrieve Attachment file names: \n" + error;
+						ErrorMessage = "The following message occured while trying to retrieve Attachment file names:: \n" + error;
 						return null;
 					} catch (Exception e) {
 						// Intentially left blank

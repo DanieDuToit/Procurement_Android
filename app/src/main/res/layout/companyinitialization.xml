@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+    <!-- AVI Key -->
+    <TextView
+        style="@style/H2"
+        android:paddingBottom="15dip"
+        android:id="@+id/lblAviKey"
+        android:text="AVI Key"
+        android:layout_marginBottom="20dip"/>
+    <TextView
+        style="@style/input_field"
+        android:id="@+id/tvAviKey"
+        android:layout_width="fill_parent"
+        android:paddingBottom="15dip"
+        android:layout_alignBaseline="@+id/lblAviKey"
+        android:layout_alignStart="@+id/etDeviceId"
+        android:paddingRight="10dip"
+        android:textStyle="bold"
+        android:textSize="20dip"
+        android:textIsSelectable="false"
+        android:layout_marginBottom="20dip"/>
+
+    <!-- SupplierCardCode -->
+
+    <!-- SupplierCardName -->
+    <TextView
+        style="@style/H2"
+        android:paddingBottom="15dip"
+        android:id="@+id/lblDeviceId"
+        android:text="Device Id"
+        android:layout_marginRight="20dip"
+        android:layout_below="@+id/lblAviKey"
+        android:layout_marginBottom="5dip"/>
+    <EditText
+        style="@style/input_field"
+        android:id="@+id/etDeviceId"
+        android:layout_width="100dip"
+        android:layout_toRightOf="@id/lblDeviceId"
+        android:layout_alignBaseline="@+id/lblDeviceId"
+        android:editable="true"
+        android:textSize="20dip"
+        android:paddingBottom="15dip"
+        android:layout_marginBottom="20dip"
+        android:textStyle="bold"/>
+
+    <Button
+        style="@style/button"
+        android:layout_width="100sp"
+        android:background="@drawable/buttonshape"
+        android:id="@+id/btnSubmitCompanyInfo"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentStart="false"
+        android:layout_alignStart="@id/etDeviceId"
+        android:text="Submit"
+        android:layout_below="@+id/lblDeviceId"/>
+</RelativeLayout>

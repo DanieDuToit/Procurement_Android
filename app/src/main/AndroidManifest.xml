@@ -35,7 +35,7 @@
     <application
         android:allowBackup="true"
         android:name=".GlobalState"
-        android:icon="@drawable/mainlogo"
+        android:icon="@drawable/logoicon"
         android:label="@string/app_name"
         android:theme="@style/CustomTheme">
         <activity
@@ -80,6 +80,16 @@
             <!--android:screenOrientation="portrait"-->
             <intent-filter>
                 <action android:name="android.intent.action.ShowAttachedDocuments_Activity"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".CompanyInit_Activity"
+            android:launchMode="singleTop"
+            android:label="@string/app_name">
+            <!--android:screenOrientation="portrait"-->
+            <intent-filter>
+                <action android:name="android.intent.action.CompanyInit_Activity"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>

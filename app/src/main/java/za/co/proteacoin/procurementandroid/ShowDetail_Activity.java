@@ -299,13 +299,13 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
         @Override
         protected Void doInBackground(Void... params) {
             // Get Requisition detail
-            url = GlobalState.getInternetURL() + "RequisitionJsons.php?functionName=getRequisitionDetail";
+            url = GlobalState.INTERNET_URL + "RequisitionJsons.php?functionName=getRequisitionDetail";
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
 
             // Making a request to url and getting response
             List<NameValuePair> queryParams = new ArrayList<NameValuePair>();
-            queryParams.add(new BasicNameValuePair("CurrentSapDatabaseId", gs.getCompanyDatabase().toString()));
+//            queryParams.add(new BasicNameValuePair("CurrentSapDatabaseId", gs.getCompanyDatabase().toString()));
             queryParams.add(new BasicNameValuePair("requisitionId", String.valueOf(gs.getRequisitionId())));
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.POST, queryParams);
 
@@ -314,38 +314,30 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
             if (jsonStr != null) {
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
-                    // Check if there was an error
-                    boolean response = jsonObj.getBoolean("responseOK");
-                    if (!response) {
-                        // Handle error
-                        String errorMsg = jsonObj.getString("responseMessage");
-                        new AlertDialog.Builder(ShowDetail_Activity.this)
-                                .setTitle("Error")
-                                .setMessage("The following message occured while trying to retrieve the requisition detail: " + errorMsg)
-                                .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        android.os.Process.killProcess(android.os.Process.myPid());
-                                        System.exit(1);
-                                    }
-                                })
-                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                .show();
-
-                        return null;
-                    }
 
                     // Getting JSON Array node
-                    dataOBJ = jsonObj.getJSONObject("requisitionDetail");
+                    data = jsonObj.getJSONArray("requisitionDetail");
+
+                    // Check for error
+                    JSONObject jo = data.getJSONObject(0);
+                    try {
+                        String error = jo.getString("Error");
+                        hasError = true;
+                        ErrorMessage = "The following message occured while trying to retrieve a list of requisitions: \n" + error;
+                        return null;
+                    } catch (Exception e) {
+                        // Intentially left blank
+                    }
 
                     // Should only be one Requisition
                     // Data node is JSON Object
-                    SupplierCardCode = dataOBJ.getString(TAG_SUPPLIERCARDCODE);
-                    SupplierCardName = dataOBJ.getString(TAG_SUPPLIERCARDNAME);
-                    SupplierContactName = dataOBJ.getString(TAG_SUPPLIERCONTACTNAME);
-                    SupplierTelephone = dataOBJ.getString(TAG_SUPPLIERTELEPHONE);
-                    SupplierEmail = dataOBJ.getString(TAG_SUPPLIEREMAIL);
-                    RequisitionContactPersonName = dataOBJ.getString(TAG_REQUISITIONCONTACTPERSONNAME);
-                    RequisitionContactNumber = dataOBJ.getString(TAG_REQUISITIONCONTACTNUMBER);
+                    SupplierCardCode = jo.getString(TAG_SUPPLIERCARDCODE);
+                    SupplierCardName = jo.getString(TAG_SUPPLIERCARDNAME);
+                    SupplierContactName = jo.getString(TAG_SUPPLIERCONTACTNAME);
+                    SupplierTelephone = jo.getString(TAG_SUPPLIERTELEPHONE);
+                    SupplierEmail = jo.getString(TAG_SUPPLIEREMAIL);
+                    RequisitionContactPersonName = jo.getString(TAG_REQUISITIONCONTACTPERSONNAME);
+                    RequisitionContactNumber = jo.getString(TAG_REQUISITIONCONTACTNUMBER);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -355,13 +347,13 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
 
             // ********************************************************************
             // Get Approvers List
-            url = GlobalState.getInternetURL() + "RequisitionJsons.php?functionName=getApprovers";
+            url = GlobalState.INTERNET_URL + "RequisitionJsons.php?functionName=getApprovers";
             // Creating service handler class instance
             sh = new ServiceHandler();
 
             // Making a request to url and getting response
             queryParams = new ArrayList<NameValuePair>();
-            queryParams.add(new BasicNameValuePair("systemUserId", String.valueOf(gs.getSystemUserId())));
+            queryParams.add(new BasicNameValuePair("systemUserId", String.valueOf(gs.getCommonUserId())));
             jsonStr = sh.makeServiceCall(url, ServiceHandler.POST, queryParams);
 
             Log.d("Response: ", "> " + jsonStr);
@@ -370,26 +362,26 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
 
-                    // Check if there was an error
-                    boolean response = jsonObj.getBoolean("responseOK");
-                    if (!response) {
-                        // Handle error
-                        String errorMsg = jsonObj.getString("responseMessage");
-                        new AlertDialog.Builder(ShowDetail_Activity.this)
-                                .setTitle("Error")
-                                .setMessage("The following eror occured while trying to retrieve the requisition detail: " + errorMsg)
-                                .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        android.os.Process.killProcess(android.os.Process.myPid());
-                                        System.exit(1);
-                                    }
-                                })
-                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                .show();
-
-                        return null;
-                    }
-
+//                    // Check if there was an error
+//                    boolean response = jsonObj.getBoolean("responseOK");
+//                    if (!response) {
+//                        // Handle error
+//                        String errorMsg = jsonObj.getString("responseMessage");
+//                        new AlertDialog.Builder(ShowDetail_Activity.this)
+//                                .setTitle("Error")
+//                                .setMessage("The following eror occured while trying to retrieve the requisition detail: " + errorMsg)
+//                                .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        android.os.Process.killProcess(android.os.Process.myPid());
+//                                        System.exit(1);
+//                                    }
+//                                })
+//                                .setIcon(android.R.drawable.ic_dialog_alert)
+//                                .show();
+//
+//                        return null;
+//                    }
+//
                     data = jsonObj.getJSONArray(TAG_APPROVERS);
 
                     // Check for error
@@ -482,13 +474,13 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
 
-            url = GlobalState.getInternetURL() + "RequisitionJsons.php?functionName=requsitionIterationsaveOption";
+            url = GlobalState.INTERNET_URL + "RequisitionJsons.php?functionName=requsitionIterationsaveOption";
 
             // Making a request to url and getting response
             List<NameValuePair> queryParams = new ArrayList<NameValuePair>();
             queryParams.add(new BasicNameValuePair("requisitionId", gs.getRequisitionId()));
             queryParams.add(new BasicNameValuePair("iterationComments", comment));
-            queryParams.add(new BasicNameValuePair("approvedBy", gs.getSystemUserId()));
+            queryParams.add(new BasicNameValuePair("approvedBy", gs.getCommonUserId()));
             queryParams.add(new BasicNameValuePair("requisitionSaveOption", String.valueOf(selectedAction)));
             if (selectedAction == SaveActions.SENDFORAPPROVAL.getNumericType())
                 queryParams.add(new BasicNameValuePair("requisitionApprover", String.valueOf(nextApproverId)));
@@ -500,24 +492,16 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
 
-                    boolean response = jsonObj.getBoolean("responseOK");
-                    if (!response) {
+                    // Check for error
+                    JSONObject jo = data.getJSONObject(0);
+                    try {
+                        String error = jo.getString("Error");
+                        hasError = true;
+                        ErrorMessage = "The following message occured while trying to retrieve Attachment file names:: \n" + error;
                         updateSuccessFull = false;
-                        // Handle error
-                        String errorMsg = jsonObj.getString("responseMessage");
-                        new AlertDialog.Builder(ShowDetail_Activity.this)
-                                .setTitle("Error")
-                                .setMessage("The following message occured while trying to retrieve the requisition detail: " + errorMsg)
-                                .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        android.os.Process.killProcess(android.os.Process.myPid());
-                                        System.exit(1);
-                                    }
-                                })
-                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                .show();
-
                         return null;
+                    } catch (Exception e) {
+                        // Intentially left blank
                     }
                     updateSuccessFull = true;
                 } catch (JSONException e) {

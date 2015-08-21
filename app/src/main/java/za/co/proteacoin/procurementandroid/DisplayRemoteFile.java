@@ -117,7 +117,7 @@ public class DisplayRemoteFile extends Activity {
                 return null;
             }
             try {
-                URL url = new URL(GlobalState.getInternetURL() + "apiGetDocumentBinary.php?requisitionDocumentId=" + gs.getRequisitionDocumentId());
+                URL url = new URL(GlobalState.INTERNET_URL + "apiGetDocumentBinary.php?requisitionDocumentId=" + gs.getRequisitionDocumentId());
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestMethod("GET");

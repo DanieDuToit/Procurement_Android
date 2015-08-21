@@ -4,7 +4,10 @@
               android:layout_height="fill_parent"
               android:orientation="vertical"
     >
-    <ScrollView android:layout_width="fill_parent" android:layout_height="fill_parent">
+    <ScrollView android:layout_width="fill_parent" android:layout_height="fill_parent"
+                android:layout_gravity="top"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:layout_width="fill_parent"
                   android:layout_height="fill_parent"
@@ -14,14 +17,13 @@
             android:id="@+id/imageView"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:maxHeight="150dp" android:layout_gravity="left"
-            android:src="@drawable/logo"/>
+            android:src="@drawable/logo"
+            android:adjustViewBounds="true"/>
 
     <TextView
         android:id="@+id/textView"
         style="@style/H1"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="25dp"
         android:text="@string/loginPrompt"
         android:textSize="21sp"/>
     <TableLayout
@@ -29,7 +31,7 @@
         android:layout_height="wrap_content">
 
         <TableRow
-            android:layout_width="wrap_content"
+            android:layout_width="200dip"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp">
 
@@ -37,14 +39,15 @@
                 style="@style/H2"
                 android:layout_column="0"
                 android:layout_marginLeft="10dp"
-                android:text="@string/companyName"
+                android:text="@string/companyDomain"
                 android:textSize="17sp"/>
 
-            <Spinner
-                android:id="@+id/companies"
-                android:layout_width="fill_parent"
+            <EditText
+                android:id="@+id/domainName"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:spinnerMode="dropdown"/>
+                android:spinnerMode="dropdown"
+                android:layout_marginLeft="15dp"/>
         </TableRow>
 
         <TableRow
@@ -62,7 +65,9 @@
             <EditText
                 style="@style/input_field"
                 android:id="@+id/userName"
-                android:layout_column="1"/>
+                android:layout_column="1"
+                android:layout_width="200dp"
+                android:layout_marginLeft="15dp"/>
         </TableRow>
 
         <TableRow
@@ -81,11 +86,24 @@
                 style="@style/input_field"
                 android:id="@+id/password"
                 android:layout_column="1"
-                android:inputType="textPassword"/>
+                android:inputType="textPassword"
+                android:layout_width="200dp"
+                android:layout_marginLeft="15dp"/>
+        </TableRow>
+        <TableRow>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/companySelectorContainer"
+                android:layout_span="2">
+            </LinearLayout>
         </TableRow>
     </TableLayout>
 
-    <Button
+
+        <Button
         style="@style/button"
         android:id="@+id/loginButton"
         android:layout_width="150sp"
@@ -98,5 +116,6 @@
         android:layout_below="@id/loginButton"/>
         </LinearLayout>
     </ScrollView>
+
 </LinearLayout>
 

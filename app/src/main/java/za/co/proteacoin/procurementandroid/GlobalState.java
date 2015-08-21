@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -25,6 +26,10 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 public class GlobalState extends Application {
 
@@ -39,11 +44,24 @@ public class GlobalState extends Application {
 	private ArrayList<String> fileNames = new ArrayList<String>();
 	private String currentFile;
 	private String documentMimeType;
-	private String systemUserId;
+	private String commonUserId;
+	private String domainId;
 	private String uniqueDeviceId;
 	private String gcmIdentification;
 	private String ivKey;
-	public static String PROJECT_ID = "564345734817";
+	private int CalmDeviceId;
+	private Cipher cipher;
+	private IvParameterSpec ivspec;
+	private SecretKeySpec keyspec;
+	private String userFirstName;
+	private String userSurName;
+
+	public final static String PROJECT_ID = "564345734817";
+	public final static String SYSTEM_APPLICATION_ID = "3";
+//	public final static String INTERNET_URL = "http://172.24.0.239:9001/SAPWebXPHP/Main/AjaxPages/";
+	public final static String INTERNET_URL = "http://172.24.1.221/SAPWebXPHP/AjaxPages/";
+	public final static IvParameterSpec IV_KEY = new IvParameterSpec(("23342DFA23342DFA").getBytes());
+	public final static SecretKeySpec CALM_APPLICATION__KEY = new SecretKeySpec(("8qxRdXT169oH77r8").getBytes(), "AES");
 
 	private static Context context;
 
@@ -51,12 +69,16 @@ public class GlobalState extends Application {
 		super.onCreate();
 		context = getApplicationContext();
 		uniqueDeviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+		try {
+			cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
-	public static String getInternetURL() {
-//		return "http://172.24.0.239/SAPWebXPHP/AjaxPages/";
-		return "http://172.24.0.239:9001/SAPWebXPHP/Main/AjaxPages/";
-	}
 
 	public static Context getAppContext() {
 		return GlobalState.context;
@@ -79,12 +101,11 @@ public class GlobalState extends Application {
 	}
 
 	// TODO - Change the hardcoded userID
-	public String getSystemUserId() {
-//		return systemUserId;
-		return "1256";
+	public String getCommonUserId() {
+		return commonUserId;
 	}
-	public void setSystemUserId(String systemUserId) {
-		this.systemUserId = systemUserId;
+	public void setCommonUserId(String commonUserId) {
+		this.commonUserId = commonUserId;
 	}
 
 	public String getDocumentMimeType() {
@@ -108,20 +129,10 @@ public class GlobalState extends Application {
 		this.currentFile = currentFile;
 	}
 
-	public ArrayList<String> getFileNames() {
-		return fileNames;
-	}
 	public void setFileName(String file) {
 		int position = this.fileNames.indexOf(file);
 		if (position < 0) {
 			this.fileNames.add(file);
-		}
-	}
-
-	public void removeFileName(String file) {
-		int position = this.fileNames.indexOf(file);
-		if (position > 0) {
-			this.fileNames.remove(position);
 		}
 	}
 
@@ -137,10 +148,20 @@ public class GlobalState extends Application {
 	}
 
 	public Integer getCompanyDatabase() {
-		return companyDatabaseId;
+		// TODO remve hardcoded Id
+//		return companyDatabaseId;
+		return 2;
 	}
 	public void setCompanyDatabase(Integer companyDatabaseId) {
 		this.companyDatabaseId = companyDatabaseId;
+	}
+
+	public String getDomainId() {
+		return domainId;
+	}
+
+	public void setDomainId(String domainId) {
+		this.domainId = domainId;
 	}
 
 	public String getRequisitionId() {
@@ -148,6 +169,35 @@ public class GlobalState extends Application {
 	}
 	public void setRequisitionId(String requisitionId) {
 		this.requisitionId = requisitionId;
+	}
+
+	public int getCalmDeviceId() {
+		return CalmDeviceId;
+	}
+	public void setCalmDeviceId(int calmDeviceId) {
+		this.CalmDeviceId = calmDeviceId;
+	}
+
+	public String getUserFirstName() {
+		return userFirstName;
+	}
+	public void setUserFirstName(String userFirstName) {
+		this.userFirstName = userFirstName;
+	}
+
+	public String getUserSurName() {
+		return userSurName;
+	}
+	public void setUserSurName(String userSurName) {
+		this.userSurName = userSurName;
+	}
+	// End Getter & Setters
+
+	public void removeFileName(String file) {
+		int position = this.fileNames.indexOf(file);
+		if (position > 0) {
+			this.fileNames.remove(position);
+		}
 	}
 
 	public String toDouble(Double doubleValue, boolean isMoney) {
@@ -225,7 +275,7 @@ public class GlobalState extends Application {
 
 		Log.i(GCMConfig.TAG, "unregistering device (regId = " + regId + ")");
 
-		String serverUrl = getInternetURL() + "GCM_Register.php/unregister";
+		String serverUrl = INTERNET_URL + "GCM_Register.php/unregister";
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("regId", regId);
 
@@ -327,5 +377,63 @@ public class GlobalState extends Application {
 	public void releaseWakeLock() {
 		if (wakeLock != null) wakeLock.release();
 		wakeLock = null;
+	}
+	public byte[] encrypt(String text) throws Exception {
+		if (text == null || text.length() == 0) {
+			throw new Exception("Empty string");
+		}
+		byte[] encrypted = null;
+		try {
+			cipher.init(Cipher.ENCRYPT_MODE, CALM_APPLICATION__KEY, IV_KEY);
+			encrypted = cipher.doFinal(text.getBytes("UTF-8"));
+		} catch (Exception e) {
+			throw new Exception("[encrypt] " + e.getMessage());
+		}
+		return encrypted;
+	}
+
+	public byte[] decrypt(String code) throws Exception {
+		if (code == null || code.length() == 0) {
+			throw new Exception("Empty string");
+		}
+		byte[] decrypted = null;
+		try {
+			cipher.init(Cipher.DECRYPT_MODE, CALM_APPLICATION__KEY, IV_KEY);
+			decrypted = cipher.doFinal(hexToBytes(code));
+		} catch (Exception e) {
+			throw new Exception("[decrypt] " + e.getMessage());
+		}
+		return decrypted;
+	}
+
+	public static String bytesToHex(byte[] data) {
+		if (data == null) {
+			return null;
+		}
+		int len = data.length;
+		String str = "";
+		for (int i = 0; i < len; i++) {
+			if ((data[i] & 0xFF) < 16) {
+				str = str + "0" + java.lang.Integer.toHexString(data[i] & 0xFF);
+			} else {
+				str = str + java.lang.Integer.toHexString(data[i] & 0xFF);
+			}
+		}
+		return str;
+	}
+
+	public static byte[] hexToBytes(String str) {
+		if (str == null) {
+			return null;
+		} else if (str.length() < 2) {
+			return null;
+		} else {
+			int len = str.length() / 2;
+			byte[] buffer = new byte[len];
+			for (int i = 0; i < len; i++) {
+				buffer[i] = (byte) Integer.parseInt(str.substring(i * 2, i * 2 + 2), 16);
+			}
+			return buffer;
+		}
 	}
 }

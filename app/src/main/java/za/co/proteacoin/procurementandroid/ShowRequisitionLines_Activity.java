@@ -99,7 +99,7 @@ public class ShowRequisitionLines_Activity extends ListActivity {
 
 		@Override
 		protected Void doInBackground(Void... voids) {
-			String url = GlobalState.getInternetURL() + "RequisitionJsons.php?functionName=getRequisitionLines";
+			String url = GlobalState.INTERNET_URL + "RequisitionJsons.php?functionName=getRequisitionLines";
 			// Creating service handler class instance
 			ServiceHandler sh = new ServiceHandler();
 
