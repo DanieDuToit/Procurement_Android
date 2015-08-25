@@ -45,7 +45,16 @@ public class GlobalState extends Application {
 	private String currentFile;
 	private String documentMimeType;
 	private String commonUserId;
-	private String domainId;
+
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	private String userName;
+	private String domainName;
 	private String uniqueDeviceId;
 	private String gcmIdentification;
 	private String ivKey;
@@ -55,13 +64,17 @@ public class GlobalState extends Application {
 	private SecretKeySpec keyspec;
 	private String userFirstName;
 	private String userSurName;
+	private static long startTime;
 
 	public final static String PROJECT_ID = "564345734817";
 	public final static String SYSTEM_APPLICATION_ID = "3";
+	public final static String LOGIN_URL = "http://172.24.1.221/CALM/api/mobileApplicationLogin.php";
 //	public final static String INTERNET_URL = "http://172.24.0.239:9001/SAPWebXPHP/Main/AjaxPages/";
-	public final static String INTERNET_URL = "http://172.24.1.221/SAPWebXPHP/AjaxPages/";
+//	public final static String INTERNET_URL = "http://172.24.1.221/SAPWebXPHP/AjaxPages/"; // Brians PC
+	public final static String INTERNET_URL = "http://172.24.0.37/SAPWebXPHP/AjaxPages/"; // QA Server
 	public final static IvParameterSpec IV_KEY = new IvParameterSpec(("23342DFA23342DFA").getBytes());
 	public final static SecretKeySpec CALM_APPLICATION__KEY = new SecretKeySpec(("8qxRdXT169oH77r8").getBytes(), "AES");
+	public final static long INACTIVE_TIMEOUT = 3 * 60 * 1000; // 3 minutes
 
 	private static Context context;
 
@@ -85,6 +98,13 @@ public class GlobalState extends Application {
 	}
 
 	public String getUniqueDeviceId() {return uniqueDeviceId;}
+
+	public static long getStartTime() {
+		return startTime;
+	}
+	public static void setStartTime(long startTime) {
+		GlobalState.startTime = startTime;
+	}
 
 	public String getIvKey() {
 		return ivKey;
@@ -147,21 +167,21 @@ public class GlobalState extends Application {
 		this.companyName = companyName;
 	}
 
-	public Integer getCompanyDatabase() {
+	public Integer getCompanyDatabaseId() {
 		// TODO remve hardcoded Id
 //		return companyDatabaseId;
 		return 2;
 	}
-	public void setCompanyDatabase(Integer companyDatabaseId) {
+	public void setCompanyDatabaseId(Integer companyDatabaseId) {
 		this.companyDatabaseId = companyDatabaseId;
 	}
 
-	public String getDomainId() {
-		return domainId;
+	public String getDomainName() {
+		return domainName;
 	}
 
-	public void setDomainId(String domainId) {
-		this.domainId = domainId;
+	public void setDomainName(String domainName) {
+		this.domainName = domainName;
 	}
 
 	public String getRequisitionId() {
@@ -406,7 +426,7 @@ public class GlobalState extends Application {
 		return decrypted;
 	}
 
-	public static String bytesToHex(byte[] data) {
+	public String bytesToHex(byte[] data) {
 		if (data == null) {
 			return null;
 		}

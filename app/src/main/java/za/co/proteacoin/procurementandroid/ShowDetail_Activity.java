@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
@@ -19,10 +20,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+
+import javax.crypto.Cipher;
 
 /**
  * Created by dutoitd1 on 2015/02/26.
@@ -83,6 +87,24 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
     private boolean updateSuccessFull = false;
     private boolean hasError = false;
     private String ErrorMessage = "";
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GlobalState.setStartTime(SystemClock.uptimeMillis());
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        GlobalState.setStartTime(SystemClock.uptimeMillis());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GlobalState.setStartTime(SystemClock.uptimeMillis());
+    }
 
     // for JSON
     @Override
@@ -303,17 +325,37 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
 
+            JSONObject obj = new JSONObject();
+            try {
+                obj.put("CurrentSapDatabaseId", gs.getCompanyDatabaseId());
+                obj.put("requisitionId", gs.getRequisitionId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String source = obj.toString();
+            String encryptedString = "";
+
+            try {
+                encryptedString = gs.bytesToHex(gs.encrypt(source));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             // Making a request to url and getting response
             List<NameValuePair> queryParams = new ArrayList<NameValuePair>();
-//            queryParams.add(new BasicNameValuePair("CurrentSapDatabaseId", gs.getCompanyDatabase().toString()));
-            queryParams.add(new BasicNameValuePair("requisitionId", String.valueOf(gs.getRequisitionId())));
+            queryParams.add(new BasicNameValuePair("mobileDeviceId", String.valueOf(gs.getCalmDeviceId())));
+            queryParams.add(new BasicNameValuePair("systemApplicationId", GlobalState.SYSTEM_APPLICATION_ID));
+            queryParams.add(new BasicNameValuePair("encryptedPackage", encryptedString));
+
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.POST, queryParams);
 
-            Log.d("Response: ", "> " + jsonStr);
+//            Log.d("Response: ", "> " + jsonStr);
 
             if (jsonStr != null) {
                 try {
-                    JSONObject jsonObj = new JSONObject(jsonStr);
+
+                    byte[] decryptedJson = gs.decrypt(jsonStr);
+                    JSONObject jsonObj = new JSONObject(new String(decryptedJson));
 
                     // Getting JSON Array node
                     data = jsonObj.getJSONArray("requisitionDetail");
@@ -323,7 +365,7 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
                     try {
                         String error = jo.getString("Error");
                         hasError = true;
-                        ErrorMessage = "The following message occured while trying to retrieve a list of requisitions: \n" + error;
+                        ErrorMessage = "The following message occured while trying to retrieve requisition: " + String.valueOf(gs.getRequisitionId()) + " \n" + error;
                         return null;
                     } catch (Exception e) {
                         // Intentially left blank
@@ -338,7 +380,7 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
                     SupplierEmail = jo.getString(TAG_SUPPLIEREMAIL);
                     RequisitionContactPersonName = jo.getString(TAG_REQUISITIONCONTACTPERSONNAME);
                     RequisitionContactNumber = jo.getString(TAG_REQUISITIONCONTACTNUMBER);
-                } catch (JSONException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             } else {
@@ -352,44 +394,42 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
             sh = new ServiceHandler();
 
             // Making a request to url and getting response
-            queryParams = new ArrayList<NameValuePair>();
-            queryParams.add(new BasicNameValuePair("systemUserId", String.valueOf(gs.getCommonUserId())));
+            obj = new JSONObject();
+            try {
+                obj.put("systemUserId", gs.getCommonUserId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            source = obj.toString();
+//            source = "{\"systemUserId\":\"" + String.valueOf(gs.getCommonUserId()) + "\"}";
+            encryptedString = "";
+
+            try {
+                encryptedString = gs.bytesToHex(gs.encrypt(source));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            queryParams.add(new BasicNameValuePair("mobileDeviceId", String.valueOf(gs.getCalmDeviceId())));
+            queryParams.add(new BasicNameValuePair("systemApplicationId", GlobalState.SYSTEM_APPLICATION_ID));
+            queryParams.add(new BasicNameValuePair("encryptedPackage", encryptedString));
+
             jsonStr = sh.makeServiceCall(url, ServiceHandler.POST, queryParams);
 
             Log.d("Response: ", "> " + jsonStr);
 
             if (jsonStr != null) {
                 try {
-                    JSONObject jsonObj = new JSONObject(jsonStr);
-
-//                    // Check if there was an error
-//                    boolean response = jsonObj.getBoolean("responseOK");
-//                    if (!response) {
-//                        // Handle error
-//                        String errorMsg = jsonObj.getString("responseMessage");
-//                        new AlertDialog.Builder(ShowDetail_Activity.this)
-//                                .setTitle("Error")
-//                                .setMessage("The following eror occured while trying to retrieve the requisition detail: " + errorMsg)
-//                                .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-//                                    public void onClick(DialogInterface dialog, int which) {
-//                                        android.os.Process.killProcess(android.os.Process.myPid());
-//                                        System.exit(1);
-//                                    }
-//                                })
-//                                .setIcon(android.R.drawable.ic_dialog_alert)
-//                                .show();
-//
-//                        return null;
-//                    }
-//
+                    byte[] decryptedJson = gs.decrypt(jsonStr);
+                    JSONObject jsonObj = new JSONObject(new String(decryptedJson));
+                    // Getting JSON Array node
                     data = jsonObj.getJSONArray(TAG_APPROVERS);
-
                     // Check for error
-                    JSONObject jo = data.getJSONObject(0);
+                    jsonObj = data.getJSONObject(0);
                     try {
-                        String error = jo.getString("Error");
+                        String error = jsonObj.getString("Error");
                         hasError = true;
-                        ErrorMessage = "The following message occured while trying to retrieve the requisition detail: \n" + error;
+                        ErrorMessage = "The following message occured while trying to retrieve the list of approvers: \n" + error;
                         return null;
                     } catch (Exception e) {
                         // Intentially left blank
@@ -410,7 +450,7 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
                         approversList.add(NextUser);
                     }
 
-                } catch (JSONException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             } else {
@@ -452,15 +492,15 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
                         })
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
+            } else {
+
+                tvSupp_name.setText(SupplierCardName);
+                tvSupp_contact_name.setText(SupplierContactName);
+                tvSupp_contact_telephone.setText(SupplierTelephone);
+                tvSupp_contact_email.setText(SupplierEmail);
+                tvReq_contact.setText(RequisitionContactPersonName);
+                tvReq_phone.setText(RequisitionContactNumber);
             }
-
-            tvSupp_name.setText(SupplierCardName);
-            tvSupp_contact_name.setText(SupplierContactName);
-            tvSupp_contact_telephone.setText(SupplierTelephone);
-            tvSupp_contact_email.setText(SupplierEmail);
-            tvReq_contact.setText(RequisitionContactPersonName);
-            tvReq_phone.setText(RequisitionContactNumber);
-
         }
     }
 
@@ -476,35 +516,57 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
 
             url = GlobalState.INTERNET_URL + "RequisitionJsons.php?functionName=requsitionIterationsaveOption";
 
+            JSONObject obj = new JSONObject();
+            try {
+                obj.put("CommonUserId", gs.getCommonUserId());
+                obj.put("requisitionId", gs.getRequisitionId());
+                obj.put("iterationComments", comment);
+                obj.put("approvedBy", gs.getCommonUserId());
+                obj.put("requisitionSaveOption", String.valueOf(selectedAction));
+                if (selectedAction == SaveActions.SENDFORAPPROVAL.getNumericType()) {
+                    obj.put("requisitionApprover", String.valueOf(nextApproverId));
+                }
+                obj.put("approvedBy", gs.getCommonUserId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String source = obj.toString();
+
+            String encryptedString = "";
+
+            try {
+                encryptedString = gs.bytesToHex(gs.encrypt(source));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             // Making a request to url and getting response
             List<NameValuePair> queryParams = new ArrayList<NameValuePair>();
-            queryParams.add(new BasicNameValuePair("requisitionId", gs.getRequisitionId()));
-            queryParams.add(new BasicNameValuePair("iterationComments", comment));
-            queryParams.add(new BasicNameValuePair("approvedBy", gs.getCommonUserId()));
-            queryParams.add(new BasicNameValuePair("requisitionSaveOption", String.valueOf(selectedAction)));
-            if (selectedAction == SaveActions.SENDFORAPPROVAL.getNumericType())
-                queryParams.add(new BasicNameValuePair("requisitionApprover", String.valueOf(nextApproverId)));
-            String jsonStr = sh.makeServiceCall(url, ServiceHandler.POST, queryParams);
 
-            Log.d("Response: ", "> " + jsonStr);
+            queryParams.add(new BasicNameValuePair("mobileDeviceId", String.valueOf(gs.getCalmDeviceId())));
+            queryParams.add(new BasicNameValuePair("systemApplicationId", GlobalState.SYSTEM_APPLICATION_ID));
+            queryParams.add(new BasicNameValuePair("encryptedPackage", encryptedString));
+
+            String jsonStr = sh.makeServiceCall(url, ServiceHandler.POST, queryParams);
 
             if (jsonStr != null) {
                 try {
-                    JSONObject jsonObj = new JSONObject(jsonStr);
+                    byte[] decryptedJson = gs.decrypt(jsonStr);
+                    JSONObject jsonObj = new JSONObject(new String(decryptedJson));
 
                     // Check for error
-                    JSONObject jo = data.getJSONObject(0);
+                    data = jsonObj.getJSONArray("result");
+                    jsonObj = data.getJSONObject(0);
                     try {
-                        String error = jo.getString("Error");
+                        String error = jsonObj.getString("Error");
                         hasError = true;
-                        ErrorMessage = "The following message occured while trying to retrieve Attachment file names:: \n" + error;
-                        updateSuccessFull = false;
+                        ErrorMessage = "The following message occured while trying to save the requisition approval request. \n" + error;
                         return null;
                     } catch (Exception e) {
                         // Intentially left blank
                     }
                     updateSuccessFull = true;
-                } catch (JSONException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             } else {
@@ -521,6 +583,13 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
         @Override
         protected void onPostExecute(Void aVoid) {
             Intent returnIntent = new Intent();
+
+            if (hasError) {
+                hasError = false;
+                returnIntent.putExtra("result", ErrorMessage);
+                setResult(RESULT_CANCELED, returnIntent);
+                finish();
+            }
             // Return to ShowGrid_Activity
             if (updateSuccessFull) {
                 if (selectedAction == SaveActions.SENDTOPROCUREMENT.getNumericType()) {
@@ -533,21 +602,6 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
                     returnIntent.putExtra("result", "Unknown result");
                 }
             }
-//            if (updateSuccessFull) {
-//                switch (SaveActions.values()[selectedAction]) {
-//                    case SENDTOPROCUREMENT:
-//                        returnIntent.putExtra("result", "Transaction was successfully send to procurement");
-//                        break;
-//                    case SENDFORAPPROVAL:
-//                        returnIntent.putExtra("result", "Transaction was successfully send for approval");
-//                        break;
-//                    case REJECTREQUEST:
-//                        returnIntent.putExtra("result", "Transaction was rejected");
-//                        break;
-//                    default:
-//                        returnIntent.putExtra("result", "Unknown result");
-//                }
-//            }
             setResult(RESULT_OK, returnIntent);
             finish();
         }

@@ -8,222 +8,252 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.SimpleAdapter;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by dutoitd1 on 2015/03/13.
- */
 public class ShowRequisitionLines_Activity extends ListActivity {
-	final String TAG = "SHOWREQUISITIONLINES_ACTIVITY";
-	private GlobalState gs;
-	private double totalValue = 0.00;
-	ListView lv;
+    private static final String TAG_LINENUMBER = "LineNumber";
+    private static final String TAG_ITEMDESCRIPTION = "ItemDescription";
+    private static final String TAG_ACCTCODE = "AcctCode";
+    private static final String TAG_QUANTITY = "Quantity";
+    private static final String TAG_LINETOTAL = "LineTotal";
+    private static final String TAG_DATA = "requisitionLines";
+    final String TAG = "SHOWREQUISITIONLINES_ACTIVITY";
+    // for JSON
+    // Hashmap for ListView
+    ArrayList<HashMap<String, String>> requisitionLinesList;
+    // Requisition's JSONArray
+    JSONArray data = null;
+    private GlobalState gs;
+    private double totalValue = 0.00;
+    private boolean hasError = false;
+    private String ErrorMessage = "";
+    private ProgressDialog pDialog;
+    // for JSON
 
-	// for JSON
-	// Hashmap for ListView
-	ArrayList<HashMap<String, String>> requisitionLinesList;
-	private static final String TAG_LINENUMBER = "LineNumber";
-	private static final String TAG_ITEMDESCRIPTION = "ItemDescription";
-	private static final String TAG_ACCTCODE = "AcctCode";
-	private static final String TAG_QUANTITY = "Quantity";
-	private static final String TAG_LINETOTAL = "LineTotal";
-	private static final String TAG_DATA = "requisitionLines";
-	private boolean hasError = false;
-	private String ErrorMessage = "";
-	// Requisition's JSONArray
-	JSONArray data = null;
-	private ProgressDialog pDialog;
-	// for JSON
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GlobalState.setStartTime(SystemClock.uptimeMillis());
+    }
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        GlobalState.setStartTime(SystemClock.uptimeMillis());
+    }
 
-		if (getActionBar() != null) {
-			getActionBar().setTitle("Requisition Lines");
-		}
-		setContentView(R.layout.show_requisition_lines);
-		gs = (GlobalState) getApplication();
-		requisitionLinesList = new ArrayList<HashMap<String, String>>();
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GlobalState.setStartTime(SystemClock.uptimeMillis());
+    }
 
-		final GetRequisitionLines downloader = new GetRequisitionLines();
-		downloader.execute();
-		Handler handler = new Handler();
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				if (downloader.getStatus() == AsyncTask.Status.RUNNING) {
-					downloader.cancel(true);
-					if (pDialog.isShowing()) {
-						pDialog.dismiss();
-					}
-					new AlertDialog.Builder(ShowRequisitionLines_Activity.this)
-							  .setTitle("Result")
-							  .setMessage("Internet connection timed out. Try again?")
-							  .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-								  public void onClick(DialogInterface dialog, int which) {
-									  Intent intent = getIntent();
-									  finish();
-									  startActivity(intent);
-								  }
-							  })
-							  .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-								  public void onClick(DialogInterface dialog, int which) {
-									  android.os.Process.killProcess(android.os.Process.myPid());
-									  System.exit(1);
-								  }
-							  })
-							  .setIcon(android.R.drawable.ic_dialog_alert)
-							  .show();
-				}
-			}
-		}, 30000);
-	}
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-	/**
-	 * Async task class to get json by making HTTP call
-	 */
-	private class GetRequisitionLines extends AsyncTask<Void, Void, Void> {
+        if (getActionBar() != null) {
+            getActionBar().setTitle("Requisition Lines");
+        }
+        setContentView(R.layout.show_requisition_lines);
+        gs = (GlobalState) getApplication();
+        requisitionLinesList = new ArrayList<>();
 
-		@Override
-		protected Void doInBackground(Void... voids) {
-			String url = GlobalState.INTERNET_URL + "RequisitionJsons.php?functionName=getRequisitionLines";
-			// Creating service handler class instance
-			ServiceHandler sh = new ServiceHandler();
+        final GetRequisitionLines downloader = new GetRequisitionLines();
+        downloader.execute();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (downloader.getStatus() == AsyncTask.Status.RUNNING) {
+                    downloader.cancel(true);
+                    if (pDialog.isShowing()) {
+                        pDialog.dismiss();
+                    }
+                    new AlertDialog.Builder(ShowRequisitionLines_Activity.this)
+                            .setTitle("Result")
+                            .setMessage("Internet connection timed out. Try again?")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = getIntent();
+                                    finish();
+                                    startActivity(intent);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    android.os.Process.killProcess(android.os.Process.myPid());
+                                    System.exit(1);
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                }
+            }
+        }, 30000);
+    }
 
-			List<NameValuePair> queryParams = new ArrayList<NameValuePair>();
-			queryParams.add(new BasicNameValuePair("requisitionId", gs.getRequisitionId()));
+    /**
+     * Async task class to get json by making HTTP call
+     */
+    private class GetRequisitionLines extends AsyncTask<Void, Void, Void> {
 
-			String jsonStr = sh.makeServiceCall(url, ServiceHandler.POST, queryParams);
+        @Override
+        protected Void doInBackground(Void... voids) {
+            String url = GlobalState.INTERNET_URL + "RequisitionJsons.php?functionName=getRequisitionLines";
+            // Creating service handler class instance
+            ServiceHandler sh = new ServiceHandler();
 
-			Log.d("Response: ", "> " + jsonStr);
+            JSONObject obj = new JSONObject();
+            try {
+                obj.put("requisitionId", gs.getRequisitionId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String source = obj.toString();
+            String encryptedString = "";
 
-			if (jsonStr != null) {
-				try {
-					JSONObject jsonObj = new JSONObject(jsonStr);
+            try {
+                encryptedString = gs.bytesToHex(gs.encrypt(source));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-					// Getting JSON Array node
-					data = jsonObj.getJSONArray(TAG_DATA);
+            List<NameValuePair> queryParams = new ArrayList<NameValuePair>();
+            queryParams.add(new BasicNameValuePair("mobileDeviceId", String.valueOf(gs.getCalmDeviceId())));
+            queryParams.add(new BasicNameValuePair("systemApplicationId", GlobalState.SYSTEM_APPLICATION_ID));
+            queryParams.add(new BasicNameValuePair("encryptedPackage", encryptedString));
 
-					// Check for error
-					JSONObject jo = data.getJSONObject(0);
-					try {
-						String error = jo.getString("Error");
-						hasError = true;
-						ErrorMessage = "The following message occured while trying to retrieve the requisition detail: \n" + error;
-						return null;
-					} catch (Exception e) {
-						// Intentially left blank
-					}
+            String jsonStr = sh.makeServiceCall(url, ServiceHandler.POST, queryParams);
 
-					// looping through All Contacts
-					for (int i = 0; i < data.length(); i++) {
-						// Data node is JSON Object
-						JSONObject c = data.getJSONObject(i);
 
-						String lineNUmber = c.getString(TAG_LINENUMBER);
-						String itemDescription = c.getString(TAG_ITEMDESCRIPTION);
-						String acctCode = c.getString(TAG_ACCTCODE);
-						String quantity = c.getString(TAG_QUANTITY);
-						String lineTotal = c.getString(TAG_LINETOTAL);
+            if (jsonStr != null) {
+                try {
+                    byte[] decryptedJson = gs.decrypt(jsonStr);
+                    JSONObject jsonObj = new JSONObject(new String(decryptedJson));
 
-						// tmp hashmap for single data object
-						HashMap<String, String> data = new HashMap<String, String>();
+                    // Getting JSON Array node
+                    JSONArray data = jsonObj.getJSONArray(TAG_DATA);
 
-						// adding each child node to HashMap key => value
-						data.put(TAG_LINENUMBER, lineNUmber);
-						data.put(TAG_ITEMDESCRIPTION, itemDescription);
-						data.put(TAG_ACCTCODE, acctCode);
-						double dbl = Double.valueOf(quantity);
-						data.put(TAG_QUANTITY, gs.toDouble(dbl, false));
-						try {
-							dbl = Double.valueOf(lineTotal);
-						} catch (Exception e) {
-							continue;
-						}
-						data.put(TAG_LINETOTAL, gs.toDouble(dbl, true));
+                    // Check for error
+                    JSONObject jo = data.getJSONObject(0);
+                    try {
+                        String error = jo.getString("Error");
+                        hasError = true;
+                        ErrorMessage = "The following message occured while trying to retrieve requisition lines: \n" + error;
+                        return null;
+                    } catch (Exception e) {
+                        // Intentially left blank
+                    }
 
-						totalValue += dbl;
+                    // looping through All Contacts
+                    for (int i = 0; i < data.length(); i++) {
+                        // Data node is JSON Object
+                        JSONObject c = data.getJSONObject(i);
+                        String lineNUmber = c.getString(TAG_LINENUMBER);
+                        String itemDescription = c.getString(TAG_ITEMDESCRIPTION);
+                        String acctCode = c.getString(TAG_ACCTCODE);
+                        String quantity = c.getString(TAG_QUANTITY);
+                        String lineTotal = c.getString(TAG_LINETOTAL);
 
-						// adding requisition line to requisitionLinesList
-						requisitionLinesList.add(data);
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			} else {
-				Log.e("ServiceHandler", "Couldn't get any data from the url");
-			}
+                        // tmp hashmap for single data object
+                        HashMap<String, String> hm = new HashMap<>();
 
-			return null;
-		}
+                        // adding each child node to HashMap key => value
+                        hm.put(TAG_LINENUMBER, lineNUmber);
+                        hm.put(TAG_ITEMDESCRIPTION, itemDescription);
+                        hm.put(TAG_ACCTCODE, acctCode);
+                        double dbl = Double.valueOf(quantity);
+                        hm.put(TAG_QUANTITY, gs.toDouble(dbl, false));
+                        try {
+                            dbl = Double.valueOf(lineTotal);
+                        } catch (Exception e) {
+                            continue;
+                        }
+                        hm.put(TAG_LINETOTAL, gs.toDouble(dbl, true));
 
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			// Showing progress dialog
-			pDialog = new ProgressDialog(ShowRequisitionLines_Activity.this);
-			pDialog.setMessage("Please wait...");
-			pDialog.setCancelable(true);
-			pDialog.show();
-		}
+                        totalValue += dbl;
 
-		@Override
-		protected void onPostExecute(Void aVoid) {
-			super.onPostExecute(aVoid);
-			// Dismiss the progress dialog
-			if (pDialog.isShowing()) {
-				pDialog.dismiss();
-			}
+                        // adding requisition line to requisitionLinesList
+                        requisitionLinesList.add(hm);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Log.e("ServiceHandler", "Couldn't get any data from the url");
+            }
 
-			if (hasError) {
-				hasError = false;
-				new AlertDialog.Builder(ShowRequisitionLines_Activity.this)
-						.setTitle("Error")
-						.setMessage(ErrorMessage)
-						.setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
-								android.os.Process.killProcess(android.os.Process.myPid());
-								System.exit(0);
-							}
-						})
-						.setIcon(android.R.drawable.ic_dialog_alert)
-						.show();
-			}
+            return null;
+        }
 
-			/**
-			 * Updating parsed JSON data into ListView
-			 * */
-			ListAdapter adapter = new SimpleAdapter(
-					  ShowRequisitionLines_Activity.this, requisitionLinesList,
-					  R.layout.requisition_line,
-					  new String[]{TAG_LINENUMBER,
-					               TAG_ITEMDESCRIPTION,
-					               TAG_ACCTCODE,
-					               TAG_QUANTITY,
-					               TAG_LINETOTAL},
-					  new int[]{R.id.tvLineNumber,
-					            R.id.tvItemDescription,
-					            R.id.tvAccCode,
-					            R.id.tvQuantity,
-					            R.id.tvLineTotal});
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(ShowRequisitionLines_Activity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
 
-			setListAdapter(adapter);
-			if (getActionBar() != null) {
-				getActionBar().setTitle("Requisition #" + gs.getRequisitionId() + " TOTAL: " + gs.toDouble(totalValue, true));
-			}
-		}
-	}
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing()) {
+                pDialog.dismiss();
+            }
+
+            if (hasError) {
+                hasError = false;
+                new AlertDialog.Builder(ShowRequisitionLines_Activity.this)
+                        .setTitle("Error")
+                        .setMessage(ErrorMessage)
+                        .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                android.os.Process.killProcess(android.os.Process.myPid());
+                                System.exit(0);
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            } else {
+
+                /**
+                 * Updating parsed JSON data into ListView
+                 * */
+                ListAdapter adapter = new SimpleAdapter(
+                        ShowRequisitionLines_Activity.this, requisitionLinesList,
+                        R.layout.requisition_line,
+                        new String[]{TAG_LINENUMBER,
+                                TAG_ITEMDESCRIPTION,
+                                TAG_ACCTCODE,
+                                TAG_QUANTITY,
+                                TAG_LINETOTAL},
+                        new int[]{R.id.tvLineNumber,
+                                R.id.tvItemDescription,
+                                R.id.tvAccCode,
+                                R.id.tvQuantity,
+                                R.id.tvLineTotal});
+
+                setListAdapter(adapter);
+                if (getActionBar() != null) {
+                    getActionBar().setTitle("Requisition #" + gs.getRequisitionId() + " TOTAL: " + gs.toDouble(totalValue, true));
+                }
+            }
+        }
+    }
 }

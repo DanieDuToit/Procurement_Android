@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +19,24 @@ public class CompanyInit_Activity extends Activity {
     private SharedPreferences sharedPref;
     private EditText etSAPDeviceId;
     Button btnSubmit;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GlobalState.setStartTime(SystemClock.uptimeMillis());
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        GlobalState.setStartTime(SystemClock.uptimeMillis());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GlobalState.setStartTime(SystemClock.uptimeMillis());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

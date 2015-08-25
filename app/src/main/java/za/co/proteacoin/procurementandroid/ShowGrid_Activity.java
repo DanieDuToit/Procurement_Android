@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
@@ -49,7 +50,6 @@ public class ShowGrid_Activity extends ListActivity implements View.OnClickListe
     private String filter = "";
     private ProgressDialog pDialog;
     private ListView lv;
-    private Cipher cipher;
 
     @Override
     public void onClick(View v) {
@@ -94,6 +94,24 @@ public class ShowGrid_Activity extends ListActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        GlobalState.setStartTime(SystemClock.uptimeMillis());
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        GlobalState.setStartTime(SystemClock.uptimeMillis());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GlobalState.setStartTime(SystemClock.uptimeMillis());
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.showgrid);
@@ -109,38 +127,17 @@ public class ShowGrid_Activity extends ListActivity implements View.OnClickListe
         requisitionList = new ArrayList<HashMap<String, String>>();
         lv = getListView();
 
-        // Retrieve the passed parameters
-        //---get the Bundle object passed in---
-//		Bundle bundle = getIntent().getExtras();
-        //---get the data using the getString()---
-
-//		String userName = bundle.getString("userName");
-//		String password = bundle.getString("password");
-//		String companyName = bundle.getString("companyName");
-
         // Listview on item click listener
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                // getting values from selected ListItem
-                String RequisitionId = ((TextView) view.findViewById(R.id.tvAviKey))
-                        .getText().toString();
-                String SupplierCardCode = ((TextView) view.findViewById(R.id.tvSupplierCardCode))
-                        .getText().toString();
-                String SupplierCardName = ((TextView) view.findViewById(R.id.etDeviceId))
-                        .getText().toString();
+                TextView tv = (TextView) view.findViewById(R.id.tvRequisitionId);
+                gs.setRequisitionId(tv.getText().toString());
 
-                gs.setRequisitionId(RequisitionId);
-                gs.setCompanyName(SupplierCardName);
-                gs.setCompanyCode(SupplierCardCode);
-
-                // Starting single contact activity
+                // Start the ShowDetail_Activity activity. The activity will return its result to this activity's onActivityResult
                 Intent in = new Intent(getApplicationContext(), ShowDetail_Activity.class);
-                in.putExtra(TAG_REQUISITIONID, RequisitionId);
-                in.putExtra(TAG_SUPPLIERCARDCODE, SupplierCardCode);
-                in.putExtra(TAG_SUPPLIERCARDNAME, SupplierCardName);
                 startActivityForResult(in, 1);
             }
         });
@@ -222,54 +219,34 @@ public class ShowGrid_Activity extends ListActivity implements View.OnClickListe
         @Override
         protected Void doInBackground(Void... arg0) {
             url = GlobalState.INTERNET_URL + "RequisitionJsons.php?functionName=getRequisitions";
-//			url = gs.INTERNET_URL() + "GetRequisitions.php";
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
 
-
+            JSONObject obj = new JSONObject();
             try {
-                cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
+                obj.put("filter", filter);
+                obj.put("CommonUserId", gs.getCommonUserId());
+                obj.put("CurrentSapDatabaseId", gs.getCompanyDatabaseId());
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            String source = obj.toString();
 
-            byte[] byteArray = {0x0};
-
-//            {"filter":"","CommonUserId"8","CurrentSapDatabaseId":"2"}
-            String source = "{\"filter\":\"" + filter + "\",\"CommonUserId\":\"" + gs.getCommonUserId() + "\",\"CurrentSapDatabaseId\":\"" +  gs.getCompanyDatabase().toString() + "\"}";
             String encryptedString = "";
 
             try {
-//                // Pad string to the nearest 64 bytes
-//                char[] charArray = source.toCharArray();
-//                int arrayLength = charArray.length;
-//                int blocksOf16 = (arrayLength / 16) + 1;
-//                int totalLength = blocksOf16 * 16;
-//                CharArrayWriter caw = new CharArrayWriter();
-//                caw.write(charArray, 0, arrayLength);
-//                for (int i = arrayLength - 1; i < totalLength; i++) {
-//                    caw.write(" ");
-//                }
-//                String finalString = convertToString(caw.toCharArray());
-//                byteArray = finalString.getBytes("UTF-8");
-
-                encryptedString = Procurement.bytesToHex(gs.encrypt(source));
+                encryptedString = gs.bytesToHex(gs.encrypt(source));
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
 //			// Making a request to url and getting response
-
             List<NameValuePair> queryParams = new ArrayList<NameValuePair>();
             queryParams.add(new BasicNameValuePair("mobileDeviceId", String.valueOf(gs.getCalmDeviceId())));
             queryParams.add(new BasicNameValuePair("systemApplicationId", GlobalState.SYSTEM_APPLICATION_ID));
             queryParams.add(new BasicNameValuePair("encryptedPackage", encryptedString));
 
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.POST, queryParams);
-
-            Log.d("Response: ", "> " + jsonStr);
 
             if (jsonStr != null) {
                 try {
@@ -337,28 +314,28 @@ public class ShowGrid_Activity extends ListActivity implements View.OnClickListe
                         })
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
+            } else {
+
+                /**
+                 * Updating parsed JSON data into ListView
+                 * */
+                ListAdapter adapter = new SimpleAdapter(
+                        ShowGrid_Activity.this, requisitionList,
+                        R.layout.requisition,
+                        new String[]{
+                                TAG_REQUISITIONID,
+                                TAG_SUPPLIERCARDCODE,
+                                TAG_SUPPLIERCARDNAME
+                        },
+                        new int[]{
+                                R.id.tvRequisitionId,
+                                R.id.tvSupplierCardCode,
+                                R.id.tvSupplierCardName
+                        }
+                );
+
+                setListAdapter(adapter);
             }
-
-            /**
-             * Updating parsed JSON data into ListView
-             * */
-            ListAdapter adapter = new SimpleAdapter(
-                    ShowGrid_Activity.this, requisitionList,
-                    R.layout.requisition,
-                    new String[]{
-                            TAG_REQUISITIONID,
-                            TAG_SUPPLIERCARDCODE,
-                            TAG_SUPPLIERCARDNAME
-                    },
-                    new int[]{
-                            R.id.tvAviKey,
-                            R.id.tvSupplierCardCode,
-                            R.id.etDeviceId
-                    }
-            );
-
-            setListAdapter(adapter);
         }
-
     }
 }

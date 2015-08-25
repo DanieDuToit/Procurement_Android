@@ -5,7 +5,6 @@
               android:orientation="vertical"
     >
     <ScrollView android:layout_width="fill_parent" android:layout_height="fill_parent"
-                android:layout_gravity="top"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -43,11 +42,12 @@
                 android:textSize="17sp"/>
 
             <EditText
+                android:inputType="text"
                 android:id="@+id/domainName"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:spinnerMode="dropdown"
-                android:layout_marginLeft="15dp"/>
+                android:layout_marginLeft="15dp"
+                style="@style/input_field"/>
         </TableRow>
 
         <TableRow
@@ -63,11 +63,12 @@
                 android:textSize="17sp"/>
 
             <EditText
-                style="@style/input_field"
-                android:id="@+id/userName"
-                android:layout_column="1"
+                android:inputType="text"
+                android:id="@+id/uName"
                 android:layout_width="200dp"
-                android:layout_marginLeft="15dp"/>
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                style="@style/input_field"/>
         </TableRow>
 
         <TableRow
@@ -90,16 +91,31 @@
                 android:layout_width="200dp"
                 android:layout_marginLeft="15dp"/>
         </TableRow>
-        <TableRow>
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" android:layout_gravity="left"
+            android:id="@+id/companyRow"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/H2"
+                android:layout_column="0"
+                android:layout_marginLeft="10dp"
+                android:text="Company:"
+                android:textSize="17sp"/>
+
+            <Spinner
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:id="@+id/companySelectorContainer"
-                android:layout_span="2">
-            </LinearLayout>
+                android:id="@+id/companySpinner"
+                android:layout_column="1"
+                android:layout_marginLeft="15dp"
+                android:spinnerMode="dropdown"/>
+
         </TableRow>
+
     </TableLayout>
 
 
