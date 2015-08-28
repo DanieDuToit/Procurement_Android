@@ -3,11 +3,87 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
+    <HorizontalScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent">
+<LinearLayout android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                style="@style/H2"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="Line #"
+                android:id="@+id/textView3"
+                android:layout_marginLeft="10dp"
+                android:lines="1"/>
+
+            <TextView
+                style="@style/H2"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:text="Doc Num"
+                android:id="@+id/textView2"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/textView3"
+                android:layout_marginLeft="10dp"
+                android:lines="1"/>
+
+            <TextView
+                style="@style/H2"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Acc Code"
+                android:id="@+id/textView4"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/textView2"
+                android:layout_marginLeft="10dp"
+                android:lines="1"/>
+
+            <TextView
+                style="@style/H2"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:text="Qty"
+                android:id="@+id/textView5"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/textView4"
+                android:layout_marginLeft="10dp"
+                android:lines="1"/>
+
+            <TextView
+                style="@style/H2"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Total"
+                android:id="@+id/textView6"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/textView5"
+                android:layout_marginLeft="10dp"
+                android:lines="1"/>
+        </RelativeLayout>
+    </LinearLayout>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#000000"/>
     <ListView
             android:id="@android:id/list"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:divider="@color/custom_txt_color"
-            android:dividerHeight="2dp"/>
+            android:layout_height="464dp"
+        />
 
+</LinearLayout>
+    </HorizontalScrollView>
 </LinearLayout>

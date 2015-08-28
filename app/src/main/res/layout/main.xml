@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:orientation="vertical"
     >
-    <ScrollView android:layout_width="fill_parent" android:layout_height="fill_parent"
+    <ScrollView android:layout_width="fill_parent" android:layout_height="489dp"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp">
+                android:paddingRight="10dp"
+                android:id="@+id/scrollView2">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:layout_width="fill_parent"
                   android:layout_height="fill_parent"
@@ -93,6 +94,20 @@
         </TableRow>
 
         <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+            <CheckBox
+                android:layout_column="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Show Password"
+                android:id="@+id/cbShowPassword"
+                android:checked="false"/>
+        </TableRow>
+
+        <TableRow
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp" android:layout_gravity="left"
@@ -128,10 +143,20 @@
 
     <TextView
         android:id="@+id/tv_error"
-        style="@style/errorView"
-        android:layout_below="@id/loginButton"/>
+        style="@style/errorView"/>
         </LinearLayout>
     </ScrollView>
 
-</LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send e-mail to helpdesk"
+        android:id="@+id/btnSendMail"
+        android:clickable="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        style="@android:style/Widget.ActionButton.Overflow"/>
+
+
+</RelativeLayout>
 

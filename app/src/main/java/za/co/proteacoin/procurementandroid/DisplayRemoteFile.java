@@ -35,12 +35,25 @@ public class DisplayRemoteFile extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        storageDir = new File(Environment.getExternalStorageDirectory()+File.separator+"ProcurementDownloads");
+        if (!storageDir.exists() && !storageDir.isDirectory()) {
+            // create empty directory
+            if (storageDir.mkdirs()) {
+                Log.i("CreateDir", "App dir created");
+            } else {
+                Log.w("CreateDir", "Unable to create app dir!");
+            }
+        } else {
+            Log.i("CreateDir", "App dir already exists");
+        }
+
+        DeleteDownloadedFiles();
         gs = (GlobalState) getApplication();
         if (gs.getCurrentFile() == "") {
             DeleteDownloadedFiles();
             this.finish();
         }
-        storageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/Procurement/");
 
         final downloadFile downloader = new downloadFile();
         downloader.execute();
@@ -71,31 +84,43 @@ public class DisplayRemoteFile extends Activity {
     @Override
     protected void onRestart() {
         super.onRestart();
-//        DeleteDownloadedFiles();
+        DeleteDownloadedFiles();
         this.finish();
     }
 
-    private void DeleteDownloadedFiles() {
-//        storageDir = new File(
-//                Environment.getExternalStorageDirectory().getAbsolutePath(), "/Procurement/");
-//        Log.d("before>>fileName", storageDir.toString());
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        DeleteDownloadedFiles();
+    }
 
-        if (!storageDir.exists()) {
-            if (!storageDir.mkdirs()) {
-                Log.d("App", "failed to create directory");
-            }
-        } else {
-            // delete all the current leftover files
-            String[] children = storageDir.list();
-            for (int i = 0; i < children.length; i++) {
-                new File(storageDir, children[i]).delete();
-            }
+    private void DeleteDownloadedFiles() {
+        // delete all the current leftover files
+        String[] children = storageDir.list();
+        for (int i = 0; i < children.length; i++) {
+            new File(storageDir, children[i]).delete();
         }
     }
 
+    void showError(final String err) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                new AlertDialog.Builder(DisplayRemoteFile.this)
+                        .setTitle("Error")
+                        .setMessage(err)
+                        .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                android.os.Process.killProcess(android.os.Process.myPid());
+                                System.exit(1);
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
+    }
 
     private class downloadFile extends AsyncTask<Void, Void, Void> {
-
         @Override
         protected Void doInBackground(Void... voids) {
             boolean mExternalStorageAvailable = false;
@@ -129,7 +154,7 @@ public class DisplayRemoteFile extends Activity {
 //                DeleteDownloadedFiles();
 
                 String filename = gs.getCurrentFile();//String contains storageDir name
-                newFile=new File(storageDir, filename);
+                newFile = new File(storageDir, filename);
 
                 gs.setFileName(filename);
                 fileOutput = new FileOutputStream(newFile);
@@ -161,7 +186,7 @@ public class DisplayRemoteFile extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-                if (gs.getCurrentFile() == "") {
+            if (gs.getCurrentFile() == "") {
                 DeleteDownloadedFiles();
                 DisplayRemoteFile.this.finish();
                 return;
@@ -194,23 +219,5 @@ public class DisplayRemoteFile extends Activity {
             intent.setDataAndType(uri, gs.getDocumentMimeType());
             startActivity(intent);
         }
-    }
-
-    void showError(final String err) {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                new AlertDialog.Builder(DisplayRemoteFile.this)
-                        .setTitle("Error")
-                        .setMessage("The following message occured while trying to retrieve the requisition detail: " + err)
-                        .setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                android.os.Process.killProcess(android.os.Process.myPid());
-                                System.exit(1);
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-            }
-        });
     }
 }
