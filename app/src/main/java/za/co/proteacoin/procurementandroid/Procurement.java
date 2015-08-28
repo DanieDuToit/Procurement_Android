@@ -10,20 +10,25 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TableRow;
@@ -35,6 +40,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -43,6 +49,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
 
 
 public class Procurement extends Activity {
@@ -58,6 +65,8 @@ public class Procurement extends Activity {
     private EditText pw, dn, un;
     private TextView error;
     private GlobalState gs;
+    private CheckBox cbShowPw;
+    private Button btnSendMailToHelpdesk;
 
     // Create a broadcast receiver to get message and show on screen
     private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
@@ -98,6 +107,11 @@ public class Procurement extends Activity {
             final long start = GlobalState.getStartTime();
             long millis = SystemClock.uptimeMillis() - start;
             if (millis > GlobalState.INACTIVE_TIMEOUT) {
+                ActionBar mActionBar = GlobalState.getActionBar();
+                mActionBar.setDisplayShowHomeEnabled(false);
+                mActionBar.setDisplayShowTitleEnabled(false);
+                TextView mTimeTextView = GlobalState.getActionBarTimeText();
+                mTimeTextView.setText("");
                 // Return to the Procurement screen
                 Intent intent = new Intent(getApplicationContext(), Procurement.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -106,17 +120,31 @@ public class Procurement extends Activity {
             } else {
 
                 int seconds = (int) (millis / 1000);
+
+                int disp_seconds = ((int) (GlobalState.INACTIVE_TIMEOUT / 1000)) - seconds;
+                int disp_minutes = disp_seconds / 60;
+                disp_seconds = disp_seconds % 60;
+                String mTimeLabel = "";
+                if (disp_seconds < 10) {
+                    mTimeLabel = disp_minutes + ":0" + disp_seconds;
+                } else {
+                    mTimeLabel = disp_minutes + ":" + disp_seconds;
+                }
+
                 int minutes = seconds / 60;
                 seconds = seconds % 60;
-//
-//            if (seconds < 10) {
-//                mTimeLabel.setText("" + minutes + ":0" + seconds);
-//            } else {
-//                mTimeLabel.setText("" + minutes + ":" + seconds);
-//            }
 
-                mHandler.postAtTime(this,
-                        start + (((minutes * 60) + seconds + 10) * 1000));
+                // Set the custom Action Bar
+                ActionBar mActionBar = GlobalState.getActionBar();
+                mActionBar.setDisplayShowHomeEnabled(false);
+                mActionBar.setDisplayShowTitleEnabled(false);
+                TextView mTitleTextView = GlobalState.getActionBarTimeText();
+                mTitleTextView.setText(mTimeLabel);
+
+                // Add ten seconds as next firing time
+                seconds += 10;
+                long timeInFuture = start + (((minutes * 60) + seconds ) * 1000);
+                mHandler.postAtTime(this, timeInFuture);
             }
         }
     };
@@ -141,19 +169,31 @@ public class Procurement extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        GlobalState.setStartTime(SystemClock.uptimeMillis());
+        pw.setText("");
+        trCompanyRow.setVisibility(View.INVISIBLE);
+        loginSuccessFull = false;
+        btnLogin.setText("Login");
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
         pw.setText("");
+        error.setText("");
+        trCompanyRow.setVisibility(View.INVISIBLE);
+        loginSuccessFull = false;
+        btnLogin.setText("Login");
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        error.setText("");
         pw.setText("");
+        loginSuccessFull = false;
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     @Override
@@ -164,19 +204,44 @@ public class Procurement extends Activity {
             mHandler.removeCallbacksAndMessages(null);
         }
 
+        // Cancel all Callbacks and Messages
+        mHandler.removeCallbacksAndMessages(null);
+
+        final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this
+                .findViewById(android.R.id.content)).getChildAt(0);
+        GlobalState.setViewGroup(viewGroup);
+
+        // Set the custom Action Bar
+        GlobalState.setActionBar(getActionBar());
+        ActionBar mActionBar = GlobalState.getActionBar();
+        mActionBar.setDisplayShowHomeEnabled(false);
+        mActionBar.setDisplayShowTitleEnabled(false);
+        GlobalState.setActionBarLayoutInflater(LayoutInflater.from(this));
+        LayoutInflater mInflater = GlobalState.getActionBarLayoutInflater();
+        View mCustomView = mInflater.inflate(R.layout.custom_actionbar, GlobalState.getViewGroup());
+        GlobalState.setActionBarTimeText((TextView) mCustomView.findViewById(R.id.title_time));
+        TextView tv = (TextView) mCustomView.findViewById(R.id.title_text);
+        tv.setText(GlobalState.APP_TITLE);
+        mActionBar.setCustomView(mCustomView);
+        mActionBar.setDisplayShowCustomEnabled(true);
+
+        GlobalState.getActionBarTimeText().setText("");
+
         setContentView(R.layout.main);
 
         gs = (GlobalState) getApplication();
 
         trCompanyRow = (TableRow) findViewById(R.id.companyRow);
         // Hide the company row because we will only need it to be visible after a successfull login
-        trCompanyRow.setVisibility(View.GONE);
+        trCompanyRow.setVisibility(View.INVISIBLE);
         un = (EditText) findViewById(R.id.uName);
         pw = (EditText) findViewById(R.id.password);
         dn = (EditText) findViewById(R.id.domainName);
         error = (TextView) findViewById(R.id.tv_error);
         error.setText("");
         btnLogin = (Button) findViewById(R.id.loginButton);
+        cbShowPw = (CheckBox) findViewById(R.id.cbShowPassword);
+        btnSendMailToHelpdesk = (Button) findViewById(R.id.btnSendMail);
 
         mCompaniesSpinner = (Spinner) findViewById(R.id.companySpinner);
         mCompaniesSpinner.setOnItemSelectedListener(
@@ -196,11 +261,28 @@ public class Procurement extends Activity {
                 }
         );
 
+        // add onCheckedListener on checkbox
+        // when user clicks on this checkbox, this is the handler.
+        cbShowPw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // checkbox status is changed from uncheck to checked.
+                if (!isChecked) {
+                    // show password
+                    pw.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                } else {
+                    // hide password
+                    pw.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                }
+            }
+        });
+
         SystemApplicationDatabaseIdList = new ArrayList<>();
         CompanyCodeNameList = new ArrayList<>();
 
         // Get settings that is saved to Preferences file
         sharedPref = Procurement.this.getPreferences(Context.MODE_PRIVATE);
+
         gs.setIvKey(sharedPref.getString("IVKey", ""));
         gs.setGcmIdentification(sharedPref.getString("GCMIdentification", ""));
         gs.setCalmDeviceId(sharedPref.getInt("SAPDeviceId", 0));
@@ -212,7 +294,16 @@ public class Procurement extends Activity {
         // Create editor for editing Preferences
         SharedPreferences.Editor edit = sharedPref.edit();
 
+        // Check if the IVKey has been set
+        if (gs.getIvKey().equals("")) {
+            String ivKey = CryptLib.generateRandomIV(16); //16 bytes = 128 bit
+            IvParameterSpec ivspec = new IvParameterSpec(ivKey.getBytes());
+            gs.setIvKey(ivKey);
+            edit.putString("IVKey", ivKey);
+        }
+
         // Check if the Username has been set
+        // If the username = "" it will be set after the first successfull login
         if (!gs.getUserName().equals("")) {
             // Set the Username EditView to the Username and set the field to display only
             un.setText(gs.getUserName());
@@ -220,6 +311,7 @@ public class Procurement extends Activity {
         }
 
         // Check if the Domain Name has been set
+        // If the Domain Name = "" it will be set after the first successfull login
         if (!gs.getDomainName().equals("")) {
             // Set the Domain Name EditView to the Domain Name and set the field to display only
             dn.setText(gs.getDomainName());
@@ -231,18 +323,13 @@ public class Procurement extends Activity {
             edit.putString("UniqueDeviceID", gs.getUniqueDeviceId());
         }
 
-        // Check if the Version numbver of the app has changed => regId will be ""
+        // Check if the Version number of the app has changed => regId will be ""
         final String regId = GCMRegistrar.getRegistrationId(this);
         // Check if regid already presents
         if (gs.getGcmIdentification().equals("") || regId.equals("")) {
             // Register with GCM
             GCMRegistrar.register(GlobalState.getAppContext(), GCMConfig.GOOGLE_SENDER_ID);
             GetGCMRegId();
-        }
-
-        if (gs.getIvKey().equals("")) {
-            gs.setIvKey(CryptLib.generateRandomIV(16)); //16 bytes = 128 bit
-            edit.putString("IVKey", gs.getIvKey());
         }
 
         // Apply changes to Preferences
@@ -260,28 +347,53 @@ public class Procurement extends Activity {
         }
 
         // Make sure the device has the proper dependencies.
-        GCMRegistrar.checkDevice(this);
+        try {
+            GCMRegistrar.checkDevice(this);
+        } catch (UnsupportedOperationException e) {
+            gs.showAlertDialog(Procurement.this,
+                    "Incompattable Version",
+                    e.getMessage(), false);
+            // stop executing code by return
+            return;
+        } catch (Exception ex) {
+            gs.showAlertDialog(Procurement.this,
+                    "Exception",
+                    ex.getMessage(), false);
+            // stop executing code by return
+            return;
+        }
 
         // Make sure the manifest permissions was properly set
-        GCMRegistrar.checkManifest(this);
+        try {
+            GCMRegistrar.checkManifest(this);
+        } catch (UnsupportedOperationException e) {
+            gs.showAlertDialog(Procurement.this,
+                    "Permission",
+                    e.getMessage(), false);
+            // stop executing code by return
+            return;
+        } catch (Exception ex) {
+            gs.showAlertDialog(Procurement.this,
+                    "Exception",
+                    ex.getMessage(), false);
+            // stop executing code by return
+            return;
+        }
 
         // Register custom Broadcast receiver to show messages on activity
         registerReceiver(mHandleMessageReceiver, new IntentFilter(
                 GCMConfig.DISPLAY_MESSAGE_ACTION));
 
-        // Get the version number
-        String versionName = "";
-        try {
-            final PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            versionName = packageInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        // Display the version number in the ActionBar
-        ActionBar ab = getActionBar();
-        if (ab != null)
-            ab.setTitle("Procurement. Version: " + versionName);
+        btnSendMailToHelpdesk.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "dutoitd1@proteacoin.co.za", null));
+                i.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ "dutoitd1@proteacoin.co.za" });
+                i.putExtra(android.content.Intent.EXTRA_SUBJECT, "Android Procurement Mobile Device");
+                i.putExtra(android.content.Intent.EXTRA_TEXT, "");
+                startActivity(Intent.createChooser(i, "Send email"));
+            }
+        }));
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -348,22 +460,17 @@ public class Procurement extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.action_settings:
-//                Intent setupGCMIntent = new Intent("android.intent.action.GCMRegisterActivity");
-//                startActivity(setupGCMIntent);
-                return true;
             case R.id.showIVKey:
                 // If the device has already been registered with the company then return
-                if (gs.getCalmDeviceId() > 0) {
-                    gs.showAlertDialog(Procurement.this, "Security Code", "You have already registered this device. ID: " + gs.getCalmDeviceId(), true);
-                    return true;
-                }
+//                if (gs.getCalmDeviceId() > 0) {
+//                    gs.showAlertDialog(Procurement.this, "Security Code", "You have already registered this device. ID: " + gs.getCalmDeviceId(), true);
+//                    return true;
+//                }
                 // TODO Remove the below
-                numberrOfSecurityIDViews = 0;
-                if (++numberrOfSecurityIDViews > 2) {
+                if (++numberrOfSecurityIDViews > 4) {
                     gs.showAlertDialog(Procurement.this, "Security Code", "You have reached your maximum allowed chances to view yout Security code", false);
                 } else {
-                    String msg = "You have only " + (2 - numberrOfSecurityIDViews) + " chance left to view your Security Code";
+                    String msg = "You have only " + (4 - numberrOfSecurityIDViews) + " chance left to view your Security Code";
                     new AlertDialog.Builder(Procurement.this)
                             .setTitle("Security Code")
                             .setMessage(msg)
@@ -435,13 +542,15 @@ public class Procurement extends Activity {
             ServiceHandler sh = new ServiceHandler();
 
             // TODO - Remove hardcoded values
-            password = "D@n13August";
+//            password = "D@n13August";
 
             JSONObject obj = new JSONObject();
             try {
                 obj.put("DomainName", gs.getDomainName());
                 obj.put("Username", gs.getUserName());
                 obj.put("Password", password);
+                obj.put("PushNotificationNumber", gs.getGcmIdentification());
+                obj.put("UniqueDeviceId", gs.getUniqueDeviceId());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -476,10 +585,13 @@ public class Procurement extends Activity {
                     JSONArray data = jsonObj.getJSONArray("results");
                     jsonObj = data.getJSONObject(0);
                     try {
-                        String error = jsonObj.getString("Error");
-                        hasError = true;
-                        ErrorMessage = "The following message occured while trying to login. \n" + error;
-                        return null;
+                        String status = jsonObj.getString("status");
+                        if (status.contains("error")) {
+                            String err = jsonObj.getString("message");
+                            ErrorMessage = "The following message occured while trying to login. \n" + err;
+                            hasError = true;
+                            return null;
+                        }
                     } catch (Exception e) {
                         // Intentially left blank
                     }
@@ -490,20 +602,30 @@ public class Procurement extends Activity {
                     // looping through All Companies
                     companiesTable = new Hashtable();
                     JSONArray companies = jsonObj.getJSONArray("Companies");
-                    for (int i = 0; i < companies.length(); i++) {
-                        JSONObject c = companies.getJSONObject(i);
-                        int key = c.getInt("SystemApplicationDatabaseId");
-                        String value = c.getString("CompanyCodeName");
-                        SystemApplicationDatabaseIdList.add(i, key);
-                        CompanyCodeNameList.add(i, value);
+                    try {
+                        for (int i = 0; i < companies.length(); i++) {
+                            JSONObject c = companies.getJSONObject(i);
+                            int key = c.getInt("SystemApplicationDatabaseId");
+                            String value = c.getString("CompanyCodeName");
+                            SystemApplicationDatabaseIdList.add(i, key);
+                            CompanyCodeNameList.add(i, value);
+                        }
+                    } catch (Exception e){
+                        String s = e.getMessage();
+                        // Intentially left blank in case the list of companys is empty
                     }
                     gs.setUserFirstName(firstName);
                     gs.setUserSurName(surName);
 
                     loginSuccessFull = true;
 
+                } catch (JSONException jsonExc) {
+                    jsonExc.printStackTrace();
+                    hasError = true;
+                    ErrorMessage = "A JSon Exception Occured. Possible reason may be that your device ID was not correctly captured during registration";
                 } catch (Exception e) {
                     e.printStackTrace();
+                    hasError = true;
                     ErrorMessage = "The following Exception occured while trying to login. \n" + e.getMessage();
                 }
             } else {
@@ -519,6 +641,7 @@ public class Procurement extends Activity {
             pDialog = new ProgressDialog(Procurement.this);
             pDialog.setMessage("Please wait...");
             pDialog.setCancelable(true);
+            error.setText("");
             pDialog.show();
         }
 
@@ -530,29 +653,38 @@ public class Procurement extends Activity {
             if (pDialog.isShowing()) {
                 pDialog.dismiss();
             }
-            if (loginSuccessFull) {
-                btnLogin.setText("Continue");
 
-                // Start the timer for inactivity action
-                GlobalState.setStartTime(SystemClock.uptimeMillis());
-                mHandler = new Handler();
-                mHandler.postDelayed(mUpdateTimeTask, 100);
-
-                // Save the username and domain name to the preferences file
-                sharedPref = Procurement.this.getPreferences(Context.MODE_PRIVATE);
-                // Create editor for editing Preferences
-                SharedPreferences.Editor edit = sharedPref.edit();
-                edit.putString("UserName", un.getText().toString());
-                gs.setUserName(un.getText().toString());
-                edit.putString("DomainName", dn.getText().toString());
-                gs.setDomainName(dn.getText().toString());
-                edit.apply();
-
-                mCompaniesSpinner.setAdapter(new ArrayAdapter<String>(Procurement.this, android.R.layout.simple_spinner_dropdown_item, CompanyCodeNameList));
-                trCompanyRow.setVisibility(View.VISIBLE);
-            } else {
+            if (hasError) {
                 btnLogin.setText("Login");
-                error.setText("Invalid username or password.");
+                error.setText(ErrorMessage);
+            } else {
+                if (loginSuccessFull) {
+                    btnLogin.setText("Continue");
+
+                    // Start the timer for inactivity action
+                    GlobalState.setStartTime(SystemClock.uptimeMillis());
+                    mHandler = new Handler();
+                    mHandler.postDelayed(mUpdateTimeTask, 100);
+
+                    // Save the username and domain name to the preferences file
+                    sharedPref = Procurement.this.getPreferences(Context.MODE_PRIVATE);
+                    // Create editor for editing Preferences
+                    SharedPreferences.Editor edit = sharedPref.edit();
+                    edit.putString("UserName", un.getText().toString());
+                    gs.setUserName(un.getText().toString());
+                    edit.putString("DomainName", dn.getText().toString());
+                    gs.setDomainName(dn.getText().toString());
+//                    edit.putInt("NumberrOfSecurityIDViews", 99);
+//                    numberrOfSecurityIDViews = 99;
+
+                    edit.apply();
+
+                    mCompaniesSpinner.setAdapter(new ArrayAdapter<String>(Procurement.this, android.R.layout.simple_spinner_dropdown_item, CompanyCodeNameList));
+                    trCompanyRow.setVisibility(View.VISIBLE);
+                } else {
+                    btnLogin.setText("Login");
+                    error.setText("Invalid username or password.");
+                }
             }
         }
     }

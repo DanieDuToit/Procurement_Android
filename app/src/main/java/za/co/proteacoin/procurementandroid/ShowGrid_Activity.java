@@ -1,5 +1,6 @@
 package za.co.proteacoin.procurementandroid;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 
@@ -18,12 +20,9 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.crypto.Cipher;
 
 
 /**
@@ -116,10 +115,22 @@ public class ShowGrid_Activity extends ListActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.showgrid);
 
+
+        // Set the custom Action Bar
+        GlobalState.setActionBar(getActionBar());
+        ActionBar mActionBar = GlobalState.getActionBar();
+        mActionBar.setDisplayShowHomeEnabled(false);
+        mActionBar.setDisplayShowTitleEnabled(false);
+        GlobalState.setActionBarLayoutInflater(LayoutInflater.from(this));
+        LayoutInflater mInflater = GlobalState.getActionBarLayoutInflater();
+        View mCustomView = mInflater.inflate(R.layout.custom_actionbar, GlobalState.getViewGroup());
+        GlobalState.setActionBarTimeText((TextView) mCustomView.findViewById(R.id.title_time));
+        TextView tv = (TextView) mCustomView.findViewById(R.id.title_text);
+        tv.setText(GlobalState.APP_TITLE);
+        mActionBar.setCustomView(mCustomView);
+        mActionBar.setDisplayShowCustomEnabled(true);
         gs = (GlobalState) getApplication();
-        if (getActionBar() != null) {
-            getActionBar().setTitle("Requisitions");
-        }
+
         btnFilter = (Button) findViewById(R.id.btnFilter);
         etFilter = (EditText) findViewById(R.id.etFilter);
         btnFilter.setOnClickListener(this);

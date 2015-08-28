@@ -1,15 +1,22 @@
 package za.co.proteacoin.procurementandroid;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,427 +40,497 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class GlobalState extends Application {
 
-	private final Random random = new Random();
-	private PowerManager.WakeLock wakeLock;
-	private String requisitionId;
-	private String requisitionDocumentId;
-	private String companyName;
-	private String companyCode;
-	private Integer companyDatabaseId;
-
-	private ArrayList<String> fileNames = new ArrayList<String>();
-	private String currentFile;
-	private String documentMimeType;
-	private String commonUserId;
-
-	public String getUserName() {
-		return userName;
-	}
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	private String userName;
-	private String domainName;
-	private String uniqueDeviceId;
-	private String gcmIdentification;
-	private String ivKey;
-	private int CalmDeviceId;
-	private Cipher cipher;
-	private IvParameterSpec ivspec;
-	private SecretKeySpec keyspec;
-	private String userFirstName;
-	private String userSurName;
-	private static long startTime;
-
-	public final static String PROJECT_ID = "564345734817";
-	public final static String SYSTEM_APPLICATION_ID = "3";
-	public final static String LOGIN_URL = "http://172.24.1.221/CALM/api/mobileApplicationLogin.php";
-//	public final static String INTERNET_URL = "http://172.24.0.239:9001/SAPWebXPHP/Main/AjaxPages/";
+    public static String APP_TITLE;
+    public final static String PROJECT_ID = "564345734817";
+    public final static String SYSTEM_APPLICATION_ID = "3";
+    public final static String LOGIN_URL = "http://172.24.1.221/CALM/api/mobileApplicationLogin.php";
+    //	public final static String INTERNET_URL = "http://172.24.0.239:9001/SAPWebXPHP/Main/AjaxPages/";
 //	public final static String INTERNET_URL = "http://172.24.1.221/SAPWebXPHP/AjaxPages/"; // Brians PC
-	public final static String INTERNET_URL = "http://172.24.0.37/SAPWebXPHP/AjaxPages/"; // QA Server
-	public final static IvParameterSpec IV_KEY = new IvParameterSpec(("23342DFA23342DFA").getBytes());
-	public final static SecretKeySpec CALM_APPLICATION__KEY = new SecretKeySpec(("8qxRdXT169oH77r8").getBytes(), "AES");
-	public final static long INACTIVE_TIMEOUT = 3 * 60 * 1000; // 3 minutes
+    public final static String INTERNET_URL = "http://172.24.0.37/SAPWebXPHP/AjaxPages/"; // QA Server
+    //	public final static IvParameterSpec IV_KEY = new IvParameterSpec(("23342DFA23342DFA").getBytes());
+    public final static SecretKeySpec CALM_APPLICATION__KEY = new SecretKeySpec(("8qxRdXT169oH77r8").getBytes(), "AES");
+    public final static long INACTIVE_TIMEOUT = 3 * 60 * 1000; // 3 minutes
+    private static long startTime;
+    private static ActionBar actionBar;
+    private static String versionName;
+    private static Context context;
+    private final Random random = new Random();
+    private PowerManager.WakeLock wakeLock;
+    private String requisitionId;
+    private String requisitionDocumentId;
+    private String companyName;
+    private String companyCode;
+    private Integer companyDatabaseId;
+    private ArrayList<String> fileNames = new ArrayList<String>();
+    private String currentFile;
+    private String documentMimeType;
+    private String commonUserId;
+    private String userName;
+    private String domainName;
+    private String uniqueDeviceId;
+    private String gcmIdentification;
+    private String ivKey;
+    private int CalmDeviceId;
+    private Cipher cipher;
+    private IvParameterSpec ivspec;
+    private SecretKeySpec keyspec;
+    private String userFirstName;
+    private String userSurName;
+    private static ViewGroup viewGroup;
+    private static TextView actionBarTimeText;
+    private static View actionBarCustomActionBarView;
+    private static LayoutInflater actionBarLayoutInflater;
 
-	private static Context context;
+    public static ViewGroup getViewGroup() {
+        return viewGroup;
+    }
+    public static void setViewGroup(ViewGroup viewGroup) {
+        GlobalState.viewGroup = viewGroup;
+    }
 
-	public void onCreate(){
-		super.onCreate();
-		context = getApplicationContext();
-		uniqueDeviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-		try {
-			cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    public static Context getAppContext() {
+        return GlobalState.context;
+    }
 
-	}
+    public static String getVersionName() {
+        return versionName;
+    }
 
+    public static ActionBar getActionBar() {
+        return actionBar;
+    }
 
-	public static Context getAppContext() {
-		return GlobalState.context;
-	}
+    public static void setActionBar(ActionBar actionBar) {
+        GlobalState.actionBar = actionBar;
+    }
 
-	public String getUniqueDeviceId() {return uniqueDeviceId;}
+    public static long getStartTime() {
+        return startTime;
+    }
 
-	public static long getStartTime() {
-		return startTime;
-	}
-	public static void setStartTime(long startTime) {
-		GlobalState.startTime = startTime;
-	}
+    public static void setStartTime(long startTime) {
+        GlobalState.startTime = startTime;
+    }
 
-	public String getIvKey() {
-		return ivKey;
-	}
-	public void setIvKey(String ivKey) {
-		this.ivKey = ivKey;
-	}
+    // Issue a POST request to the server.
+    private static void post(String endpoint, Map<String, String> params)
+            throws IOException {
 
-	public String getGcmIdentification() {
-		return gcmIdentification;
-	}
-	public void setGcmIdentification(String gcmIdentification) {
-		this.gcmIdentification = gcmIdentification;
-	}
+        URL url;
+        try {
 
-	// TODO - Change the hardcoded userID
-	public String getCommonUserId() {
-		return commonUserId;
-	}
-	public void setCommonUserId(String commonUserId) {
-		this.commonUserId = commonUserId;
-	}
+            url = new URL(endpoint);
 
-	public String getDocumentMimeType() {
-		return documentMimeType;
-	}
-	public void setDocumentMimeType(String documentMimeType) {
-		this.documentMimeType = documentMimeType;
-	}
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("invalid url: " + endpoint);
+        }
 
-	public String getRequisitionDocumentId() {
-		return requisitionDocumentId;
-	}
-	public void setRequisitionDocumentId(String requisitionDocumentId) {
-		this.requisitionDocumentId = requisitionDocumentId;
-	}
+        StringBuilder bodyBuilder = new StringBuilder();
+        Iterator<Map.Entry<String, String>> iterator = params.entrySet().iterator();
 
-	public String getCurrentFile() {
-		return currentFile;
-	}
-	public void setCurrentFile(String currentFile) {
-		this.currentFile = currentFile;
-	}
+        // constructs the POST body using the parameters
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> param = iterator.next();
+            bodyBuilder.append(param.getKey()).append('=')
+                    .append(param.getValue());
+            if (iterator.hasNext()) {
+                bodyBuilder.append('&');
+            }
+        }
 
-	public void setFileName(String file) {
-		int position = this.fileNames.indexOf(file);
-		if (position < 0) {
-			this.fileNames.add(file);
-		}
-	}
+        String body = bodyBuilder.toString();
 
-	public void setCompanyCode(String companyCode) {
-		this.companyCode = companyCode;
-	}
+        Log.v(GCMConfig.TAG, "Posting '" + body + "' to " + url);
 
-	public String getCompanyName() {
-		return companyName;
-	}
-	public void setCompanyName(String companyName) {
-		this.companyName = companyName;
-	}
+        byte[] bytes = body.getBytes();
 
-	public Integer getCompanyDatabaseId() {
-		// TODO remve hardcoded Id
+        HttpURLConnection conn = null;
+        try {
+
+            Log.e("URL", "> " + url);
+
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setUseCaches(false);
+            conn.setFixedLengthStreamingMode(bytes.length);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type",
+                    "application/x-www-form-urlencoded;charset=UTF-8");
+            // post the request
+            OutputStream out = conn.getOutputStream();
+            out.write(bytes);
+            out.close();
+
+            // handle the response
+            int status = conn.getResponseCode();
+
+            // If response is not success
+            if (status != 200) {
+
+                throw new IOException("Post failed with error code " + status);
+            }
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+    }
+
+    public static byte[] hexToBytes(String str) {
+        if (str == null) {
+            return null;
+        } else if (str.length() < 2) {
+            return null;
+        } else {
+            int len = str.length() / 2;
+            byte[] buffer = new byte[len];
+            for (int i = 0; i < len; i++) {
+                buffer[i] = (byte) Integer.parseInt(str.substring(i * 2, i * 2 + 2), 16);
+            }
+            return buffer;
+        }
+    }
+
+    public static void setActionBarTimeText(TextView actionBarTimeText) {
+        GlobalState.actionBarTimeText = actionBarTimeText;
+    }
+    public static TextView getActionBarTimeText() {
+        return actionBarTimeText;
+    }
+
+    public static void setActionBarCustomActionBarView(View actionBarCustomActionBarView) {
+        GlobalState.actionBarCustomActionBarView = actionBarCustomActionBarView;
+    }
+    public static View getActionBarCustomActionBarView() {
+        return actionBarCustomActionBarView;
+    }
+
+    public static void setActionBarLayoutInflater(LayoutInflater actionBarLayoutInflater) {
+        GlobalState.actionBarLayoutInflater = actionBarLayoutInflater;
+    }
+    public static LayoutInflater getActionBarLayoutInflater() {
+        return actionBarLayoutInflater;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+        public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void onCreate() {
+        super.onCreate();
+
+        context = getApplicationContext();
+        uniqueDeviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        try {
+            final PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionName = packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            versionName = "";
+            e.printStackTrace();
+        }
+        try {
+            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        GlobalState.APP_TITLE =  "Procurement V " + GlobalState.getVersionName();
+    }
+
+    public String getUniqueDeviceId() {
+        return uniqueDeviceId;
+    }
+
+    public String getIvKey() {
+        return ivKey;
+    }
+
+    public void setIvKey(String ivKey) {
+        this.ivKey = ivKey;
+    }
+
+    public String getGcmIdentification() {
+        return gcmIdentification;
+    }
+
+    public void setGcmIdentification(String gcmIdentification) {
+        this.gcmIdentification = gcmIdentification;
+    }
+
+    // TODO - Change the hardcoded userID
+    public String getCommonUserId() {
+        return commonUserId;
+    }
+
+    public void setCommonUserId(String commonUserId) {
+        this.commonUserId = commonUserId;
+    }
+
+    public String getDocumentMimeType() {
+        return documentMimeType;
+    }
+
+    public void setDocumentMimeType(String documentMimeType) {
+        this.documentMimeType = documentMimeType;
+    }
+
+    public String getRequisitionDocumentId() {
+        return requisitionDocumentId;
+    }
+
+    public void setRequisitionDocumentId(String requisitionDocumentId) {
+        this.requisitionDocumentId = requisitionDocumentId;
+    }
+
+    public String getCurrentFile() {
+        return currentFile;
+    }
+
+    public void setCurrentFile(String currentFile) {
+        this.currentFile = currentFile;
+    }
+
+    public void setFileName(String file) {
+        int position = this.fileNames.indexOf(file);
+        if (position < 0) {
+            this.fileNames.add(file);
+        }
+    }
+
+    public void setCompanyCode(String companyCode) {
+        this.companyCode = companyCode;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public Integer getCompanyDatabaseId() {
+        // TODO - Remove hardcoded company ID
+        return 2;
 //		return companyDatabaseId;
-		return 2;
-	}
-	public void setCompanyDatabaseId(Integer companyDatabaseId) {
-		this.companyDatabaseId = companyDatabaseId;
-	}
+    }
 
-	public String getDomainName() {
-		return domainName;
-	}
+    public void setCompanyDatabaseId(Integer companyDatabaseId) {
+        this.companyDatabaseId = companyDatabaseId;
+    }
 
-	public void setDomainName(String domainName) {
-		this.domainName = domainName;
-	}
+    public String getDomainName() {
+        return domainName;
+    }
 
-	public String getRequisitionId() {
-		return requisitionId;
-	}
-	public void setRequisitionId(String requisitionId) {
-		this.requisitionId = requisitionId;
-	}
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
+    }
 
-	public int getCalmDeviceId() {
-		return CalmDeviceId;
-	}
-	public void setCalmDeviceId(int calmDeviceId) {
-		this.CalmDeviceId = calmDeviceId;
-	}
+    public String getRequisitionId() {
+        return requisitionId;
+    }
 
-	public String getUserFirstName() {
-		return userFirstName;
-	}
-	public void setUserFirstName(String userFirstName) {
-		this.userFirstName = userFirstName;
-	}
+    public void setRequisitionId(String requisitionId) {
+        this.requisitionId = requisitionId;
+    }
 
-	public String getUserSurName() {
-		return userSurName;
-	}
-	public void setUserSurName(String userSurName) {
-		this.userSurName = userSurName;
-	}
-	// End Getter & Setters
+    public int getCalmDeviceId() {
+        return CalmDeviceId;
+    }
 
-	public void removeFileName(String file) {
-		int position = this.fileNames.indexOf(file);
-		if (position > 0) {
-			this.fileNames.remove(position);
-		}
-	}
+    public void setCalmDeviceId(int calmDeviceId) {
+        this.CalmDeviceId = calmDeviceId;
+    }
 
-	public String toDouble(Double doubleValue, boolean isMoney) {
-		DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols(Locale.ENGLISH);
-		Locale locale = new Locale("en", "ZA");
-		Currency currency = Currency.getInstance(locale);
+    public String getUserFirstName() {
+        return userFirstName;
+    }
 
-		if (isMoney) {
-			formatSymbols.setCurrency(currency);
-		}
-		formatSymbols.setDecimalSeparator('.');
-		formatSymbols.setPatternSeparator(' ');
-		String pattern = "0.00";
-		DecimalFormat df = new DecimalFormat(pattern, formatSymbols);
-		return df.format(doubleValue);
-	}
+    public void setUserFirstName(String userFirstName) {
+        this.userFirstName = userFirstName;
+    }
+    // End Getter & Setters
 
-	// Checking for all possible internet providers
-	public boolean isConnectingToInternet() {
+    public String getUserSurName() {
+        return userSurName;
+    }
 
-		ConnectivityManager connectivity =
-				(ConnectivityManager) getSystemService(
-						Context.CONNECTIVITY_SERVICE);
-		if (connectivity != null) {
-			NetworkInfo[] info = connectivity.getAllNetworkInfo();
-			if (info != null)
-				for (int i = 0; i < info.length; i++)
-					if (info[i].getState() == NetworkInfo.State.CONNECTED) {
-						return true;
-					}
+    public void setUserSurName(String userSurName) {
+        this.userSurName = userSurName;
+    }
 
-		}
-		return false;
-	}
+    public void removeFileName(String file) {
+        int position = this.fileNames.indexOf(file);
+        if (position > 0) {
+            this.fileNames.remove(position);
+        }
+    }
 
-	//Function to display simple Alert Dialog
-	public void showAlertDialog(Context context, String title, String message,
-								Boolean status) {
-		AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+    public String toDouble(Double doubleValue, boolean isMoney) {
+        DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols(Locale.ENGLISH);
+        Locale locale = new Locale("en", "ZA");
+        Currency currency = Currency.getInstance(locale);
 
-		// Set Dialog Title
-		alertDialog.setTitle(title);
+        if (isMoney) {
+            formatSymbols.setCurrency(currency);
+        }
+        formatSymbols.setDecimalSeparator('.');
+        formatSymbols.setPatternSeparator(' ');
+        String pattern = "0.00";
+        DecimalFormat df = new DecimalFormat(pattern, formatSymbols);
+        return df.format(doubleValue);
+    }
 
-		// Set Dialog Message
-		alertDialog.setMessage(message);
+    // Checking for all possible internet providers
+    public boolean isConnectingToInternet() {
 
-		if (status != null)
-			// Set alert dialog icon
-			alertDialog.setIcon((status) ? R.drawable.success : R.drawable.fail);
+        ConnectivityManager connectivity =
+                (ConnectivityManager) getSystemService(
+                        Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            if (info != null)
+                for (int i = 0; i < info.length; i++)
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+                        return true;
+                    }
 
-		// Set OK Button
-		alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
+        }
+        return false;
+    }
 
-			}
-		});
+    //Function to display simple Alert Dialog
+    public void showAlertDialog(Context context, String title, String message,
+                                Boolean status) {
+        AlertDialog alertDialog = new AlertDialog.Builder(context).create();
 
-		// Show Alert Message
-		alertDialog.show();
-	}
+        // Set Dialog Title
+        alertDialog.setTitle(title);
 
-	// Notifies UI to display a message.
-	void displayMessageOnScreen(Context context, String message) {
+        // Set Dialog Message
+        alertDialog.setMessage(message);
 
-		Intent intent = new Intent(GCMConfig.DISPLAY_MESSAGE_ACTION);
-		intent.putExtra(GCMConfig.EXTRA_MESSAGE, message);
+        if (status != null)
+            // Set alert dialog icon
+            alertDialog.setIcon((status) ? R.drawable.success : R.drawable.fail);
 
-		// Send Broadcast to Broadcast receiver with message
-		context.sendBroadcast(intent);
+        // Set OK Button
+        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
 
-	}
+            }
+        });
 
-	// Unregister this account/device pair within the server.
-	void unregister(final Context context, final String regId) {
+        // Show Alert Message
+        alertDialog.show();
+    }
 
-		Log.i(GCMConfig.TAG, "unregistering device (regId = " + regId + ")");
+    // Notifies UI to display a message.
+    void displayMessageOnScreen(Context context, String message) {
 
-		String serverUrl = INTERNET_URL + "GCM_Register.php/unregister";
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("regId", regId);
+        Intent intent = new Intent(GCMConfig.DISPLAY_MESSAGE_ACTION);
+        intent.putExtra(GCMConfig.EXTRA_MESSAGE, message);
 
-		try {
-			post(serverUrl, params);
-			GCMRegistrar.setRegisteredOnServer(context, false);
-			String message = context.getString(R.string.server_unregistered);
-			displayMessageOnScreen(context, message);
-		} catch (IOException e) {
+        // Send Broadcast to Broadcast receiver with message
+        context.sendBroadcast(intent);
 
-			// At this point the device is unregistered from GCM, but still
-			// registered in the our server.
-			// We could try to unregister again, but it is not necessary:
-			// if the server tries to send a message to the device, it will get
-			// a "NotRegistered" error message and should unregister the device.
+    }
 
-			String message = context.getString(R.string.server_unregister_error,
-					e.getMessage());
-			displayMessageOnScreen(context, message);
-		}
-	}
+    // Unregister this account/device pair within the server.
+    void unregister(final Context context, final String regId) {
 
-	// Issue a POST request to the server.
-	private static void post(String endpoint, Map<String, String> params)
-			throws IOException {
+        Log.i(GCMConfig.TAG, "unregistering device (regId = " + regId + ")");
 
-		URL url;
-		try {
+        String serverUrl = INTERNET_URL + "GCM_Register.php/unregister";
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("regId", regId);
 
-			url = new URL(endpoint);
+        try {
+            post(serverUrl, params);
+            GCMRegistrar.setRegisteredOnServer(context, false);
+            String message = context.getString(R.string.server_unregistered);
+            displayMessageOnScreen(context, message);
+        } catch (IOException e) {
 
-		} catch (MalformedURLException e) {
-			throw new IllegalArgumentException("invalid url: " + endpoint);
-		}
+            // At this point the device is unregistered from GCM, but still
+            // registered in the our server.
+            // We could try to unregister again, but it is not necessary:
+            // if the server tries to send a message to the device, it will get
+            // a "NotRegistered" error message and should unregister the device.
 
-		StringBuilder bodyBuilder = new StringBuilder();
-		Iterator<Map.Entry<String, String>> iterator = params.entrySet().iterator();
+            String message = context.getString(R.string.server_unregister_error,
+                    e.getMessage());
+            displayMessageOnScreen(context, message);
+        }
+    }
 
-		// constructs the POST body using the parameters
-		while (iterator.hasNext()) {
-			Map.Entry<String, String> param = iterator.next();
-			bodyBuilder.append(param.getKey()).append('=')
-					.append(param.getValue());
-			if (iterator.hasNext()) {
-				bodyBuilder.append('&');
-			}
-		}
+    public void acquireWakeLock(Context context) {
+        if (wakeLock != null) wakeLock.release();
 
-		String body = bodyBuilder.toString();
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 
-		Log.v(GCMConfig.TAG, "Posting '" + body + "' to " + url);
+        wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK |
+                PowerManager.ACQUIRE_CAUSES_WAKEUP |
+                PowerManager.ON_AFTER_RELEASE, "WakeLock");
 
-		byte[] bytes = body.getBytes();
+        wakeLock.acquire();
+    }
 
-		HttpURLConnection conn = null;
-		try {
+    public void releaseWakeLock() {
+        if (wakeLock != null) wakeLock.release();
+        wakeLock = null;
+    }
 
-			Log.e("URL", "> " + url);
+    public byte[] encrypt(String text) throws Exception {
+        if (text == null || text.length() == 0) {
+            throw new Exception("Empty string");
+        }
+        byte[] encrypted = null;
+        try {
+            String ivKey = this.getIvKey();
+            IvParameterSpec ivspec = new IvParameterSpec(ivKey.getBytes());
+            cipher.init(Cipher.ENCRYPT_MODE, CALM_APPLICATION__KEY, ivspec);
+            encrypted = cipher.doFinal(text.getBytes("UTF-8"));
+        } catch (Exception e) {
+            throw new Exception("[encrypt] " + e.getMessage());
+        }
+        return encrypted;
+    }
 
-			conn = (HttpURLConnection) url.openConnection();
-			conn.setDoOutput(true);
-			conn.setUseCaches(false);
-			conn.setFixedLengthStreamingMode(bytes.length);
-			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Type",
-					"application/x-www-form-urlencoded;charset=UTF-8");
-			// post the request
-			OutputStream out = conn.getOutputStream();
-			out.write(bytes);
-			out.close();
+    public byte[] decrypt(String code) throws Exception {
+        if (code == null || code.length() == 0) {
+            throw new Exception("Empty string");
+        }
+        byte[] decrypted = null;
+        try {
+            IvParameterSpec ivspec = new IvParameterSpec(this.getIvKey().getBytes());
+            cipher.init(Cipher.DECRYPT_MODE, CALM_APPLICATION__KEY, ivspec);
+            decrypted = cipher.doFinal(hexToBytes(code));
+        } catch (Exception e) {
+            throw new Exception("[decrypt] " + e.getMessage());
+        }
+        return decrypted;
+    }
 
-			// handle the response
-			int status = conn.getResponseCode();
-
-			// If response is not success
-			if (status != 200) {
-
-				throw new IOException("Post failed with error code " + status);
-			}
-		} finally {
-			if (conn != null) {
-				conn.disconnect();
-			}
-		}
-	}
-
-	public void acquireWakeLock(Context context) {
-		if (wakeLock != null) wakeLock.release();
-
-		PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-
-		wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK |
-				PowerManager.ACQUIRE_CAUSES_WAKEUP |
-				PowerManager.ON_AFTER_RELEASE, "WakeLock");
-
-		wakeLock.acquire();
-	}
-
-	public void releaseWakeLock() {
-		if (wakeLock != null) wakeLock.release();
-		wakeLock = null;
-	}
-	public byte[] encrypt(String text) throws Exception {
-		if (text == null || text.length() == 0) {
-			throw new Exception("Empty string");
-		}
-		byte[] encrypted = null;
-		try {
-			cipher.init(Cipher.ENCRYPT_MODE, CALM_APPLICATION__KEY, IV_KEY);
-			encrypted = cipher.doFinal(text.getBytes("UTF-8"));
-		} catch (Exception e) {
-			throw new Exception("[encrypt] " + e.getMessage());
-		}
-		return encrypted;
-	}
-
-	public byte[] decrypt(String code) throws Exception {
-		if (code == null || code.length() == 0) {
-			throw new Exception("Empty string");
-		}
-		byte[] decrypted = null;
-		try {
-			cipher.init(Cipher.DECRYPT_MODE, CALM_APPLICATION__KEY, IV_KEY);
-			decrypted = cipher.doFinal(hexToBytes(code));
-		} catch (Exception e) {
-			throw new Exception("[decrypt] " + e.getMessage());
-		}
-		return decrypted;
-	}
-
-	public String bytesToHex(byte[] data) {
-		if (data == null) {
-			return null;
-		}
-		int len = data.length;
-		String str = "";
-		for (int i = 0; i < len; i++) {
-			if ((data[i] & 0xFF) < 16) {
-				str = str + "0" + java.lang.Integer.toHexString(data[i] & 0xFF);
-			} else {
-				str = str + java.lang.Integer.toHexString(data[i] & 0xFF);
-			}
-		}
-		return str;
-	}
-
-	public static byte[] hexToBytes(String str) {
-		if (str == null) {
-			return null;
-		} else if (str.length() < 2) {
-			return null;
-		} else {
-			int len = str.length() / 2;
-			byte[] buffer = new byte[len];
-			for (int i = 0; i < len; i++) {
-				buffer[i] = (byte) Integer.parseInt(str.substring(i * 2, i * 2 + 2), 16);
-			}
-			return buffer;
-		}
-	}
+    public String bytesToHex(byte[] data) {
+        if (data == null) {
+            return null;
+        }
+        int len = data.length;
+        String str = "";
+        for (int i = 0; i < len; i++) {
+            if ((data[i] & 0xFF) < 16) {
+                str = str + "0" + java.lang.Integer.toHexString(data[i] & 0xFF);
+            } else {
+                str = str + java.lang.Integer.toHexString(data[i] & 0xFF);
+            }
+        }
+        return str;
+    }
 }
