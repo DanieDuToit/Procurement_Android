@@ -17,7 +17,7 @@ public class CompanyInit_Activity extends Activity {
     private GlobalState gs;
     private int numberrOfSecurityIDViews;
     private SharedPreferences sharedPref;
-    private EditText etSAPDeviceId;
+    private EditText etCalmDeviceId;
     Button btnSubmit;
 
     @Override
@@ -46,7 +46,7 @@ public class CompanyInit_Activity extends Activity {
 
         gs = (GlobalState) getApplication();
 
-        etSAPDeviceId = (EditText) findViewById(R.id.etDeviceId);
+        etCalmDeviceId = (EditText) findViewById(R.id.etDeviceId);
         btnSubmit = (Button) findViewById(R.id.btnSubmitCompanyInfo);
         TextView tv = (TextView) findViewById(R.id.tvAviKey);
         tv.setText(gs.getIvKey());
@@ -54,17 +54,17 @@ public class CompanyInit_Activity extends Activity {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (etSAPDeviceId.getText().toString().equals("")) {
+                if (etCalmDeviceId.getText().toString().equals("")) {
                     gs.showAlertDialog(CompanyInit_Activity.this, "Device Id", "You must supply the Company's Device Id", false);
                 } else {
                     try {
-                        gs.setCalmDeviceId(Integer.parseInt(etSAPDeviceId.getText().toString()));
+                        gs.setCalmDeviceId(Integer.parseInt(etCalmDeviceId.getText().toString()));
                     } catch (NumberFormatException e) {
                         gs.showAlertDialog(CompanyInit_Activity.this, "Device Id", "The Device Id can only be numeric", false);
                         return;
                     }
                     Intent resultIntent = new Intent();
-                    resultIntent.putExtra("sapDeviceId", gs.getCalmDeviceId());
+                    resultIntent.putExtra("calmDeviceId", gs.getCalmDeviceId());
                     setResult(RESULT_OK, resultIntent);
                     finish();
                 }

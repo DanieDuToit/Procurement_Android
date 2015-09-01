@@ -44,6 +44,7 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
     private static final String TAG_APPROVERS = "Approvers";
     final String TAG = "SHOWDETAIL_ACTIVITY";
     String[] mSaveOptions = {
+            "Please select an action...", // 0
             "Send to Procurement", // 3
             "Send for Approval", // 2
             "Reject Request" // 7
@@ -174,23 +175,27 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         int index = mSaveOptionsSpinner.getSelectedItemPosition();
-//                        "Send to Procurement", // 3
-//                        "Send for Approval", // 2
-//                        "Reject Request" // 7
+//                        "No Action", // 0 - Pos 0
+//                        "Send to Procurement", // 3 - Pos 1
+//                        "Send for Approval", // 2 - Pos 2
+//                        "Reject Request" // 7 - Pos 3
                         switch (index) {
-                            case 0:
+                            case 1:
                                 selectedAction = SaveActions.SENDTOPROCUREMENT.getNumericType();
                                 break;
-                            case 1:
+                            case 2:
                                 selectedAction = SaveActions.SENDFORAPPROVAL.getNumericType();
                                 break;
-                            case 2:
+                            case 3:
                                 selectedAction = SaveActions.REJECTREQUEST.getNumericType();
+                                break;
+                            default:
+                                selectedAction = SaveActions.NOACTION.getNumericType();
                                 break;
                         }
 
                         // Add a dynamic spinner for the Approvers
-                        if (position == 1) {
+                        if (selectedAction == SaveActions.SENDFORAPPROVAL.getNumericType()) {
                             /**
                              * Updating parsed JSON data into Approvers ListView
                              * */
@@ -263,41 +268,52 @@ public class ShowDetail_Activity extends Activity implements View.OnClickListene
                 break;
             case R.id.approveIt:
                 comment = etComment.getText().toString();
-                final UpdateApproval downloader = new UpdateApproval();
-                downloader.execute();
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (downloader.getStatus() == AsyncTask.Status.RUNNING) {
-                            downloader.cancel(true);
-                            if (pDialog.isShowing()) {
-                                pDialog.dismiss();
+
+                // Check if the user selected an action
+                if (selectedAction == SaveActions.NOACTION.getNumericType()) {
+                    new AlertDialog.Builder(ShowDetail_Activity.this)
+                            .setTitle("Selected Action")
+                            .setMessage("Please select an action first.")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                } else {
+                    final UpdateApproval downloader = new UpdateApproval();
+                    downloader.execute();
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (downloader.getStatus() == AsyncTask.Status.RUNNING) {
+                                downloader.cancel(true);
+                                if (pDialog.isShowing()) {
+                                    pDialog.dismiss();
+                                }
+                                new AlertDialog.Builder(ShowDetail_Activity.this)
+                                        .setTitle("Result")
+                                        .setMessage("Internet connection timed out. Try again?")
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                approveIt.performClick();
+                                            }
+                                        })
+                                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                android.os.Process.killProcess(android.os.Process.myPid());
+                                                System.exit(1);
+                                            }
+                                        })
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .show();
                             }
-                            new AlertDialog.Builder(ShowDetail_Activity.this)
-                                    .setTitle("Result")
-                                    .setMessage("Internet connection timed out. Try again?")
-                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            approveIt.performClick();
-                                        }
-                                    })
-                                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            android.os.Process.killProcess(android.os.Process.myPid());
-                                            System.exit(1);
-                                        }
-                                    })
-                                    .setIcon(android.R.drawable.ic_dialog_alert)
-                                    .show();
                         }
-                    }
-                }, 30000);
-                break;
+                    }, 30000);
+                    break;
+                }
         }
     }
 
     public enum SaveActions {
+        NOACTION(0),
         SENDTOPROCUREMENT(3),
         SENDFORAPPROVAL(2),
         REJECTREQUEST(7);

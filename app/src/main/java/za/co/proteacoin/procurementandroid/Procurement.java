@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.telephony.TelephonyManager;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -65,9 +66,6 @@ public class Procurement extends Activity {
     private EditText pw, dn, un;
     private TextView error;
     private GlobalState gs;
-    private CheckBox cbShowPw;
-    private Button btnSendMailToHelpdesk;
-
     // Create a broadcast receiver to get message and show on screen
     private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
 
@@ -85,7 +83,9 @@ public class Procurement extends Activity {
             gs.releaseWakeLock();
         }
     };
-
+    private CheckBox cbShowPw;
+    private Button btnSendMailToHelpdesk;
+    private Button btnCallHelpdesk;
     private ArrayList<Integer> SystemApplicationDatabaseIdList;
     private ArrayList<String> CompanyCodeNameList;
     private String password;
@@ -143,7 +143,7 @@ public class Procurement extends Activity {
 
                 // Add ten seconds as next firing time
                 seconds += 10;
-                long timeInFuture = start + (((minutes * 60) + seconds ) * 1000);
+                long timeInFuture = start + (((minutes * 60) + seconds) * 1000);
                 mHandler.postAtTime(this, timeInFuture);
             }
         }
@@ -156,11 +156,11 @@ public class Procurement extends Activity {
             //---if the result is OK---
             if (resultCode == RESULT_OK) {
                 //---get the result using getIntExtra()---
-                int i = data.getIntExtra("sapDeviceId", 0);
+                int i = data.getIntExtra("calmDeviceId", 0);
                 sharedPref = Procurement.this.getPreferences(Context.MODE_PRIVATE);
                 // Create editor for editing Preferences
                 SharedPreferences.Editor edit = sharedPref.edit();
-                edit.putInt("SAPDeviceId", i);
+                edit.putInt("calmDeviceId", i);
                 edit.apply();
             }
         }
@@ -170,7 +170,7 @@ public class Procurement extends Activity {
     protected void onResume() {
         super.onResume();
         pw.setText("");
-        trCompanyRow.setVisibility(View.INVISIBLE);
+        trCompanyRow.setVisibility(View.GONE);
         loginSuccessFull = false;
         btnLogin.setText("Login");
         mHandler.removeCallbacksAndMessages(null);
@@ -181,7 +181,7 @@ public class Procurement extends Activity {
         super.onRestart();
         pw.setText("");
         error.setText("");
-        trCompanyRow.setVisibility(View.INVISIBLE);
+        trCompanyRow.setVisibility(View.GONE);
         loginSuccessFull = false;
         btnLogin.setText("Login");
         mHandler.removeCallbacksAndMessages(null);
@@ -242,6 +242,7 @@ public class Procurement extends Activity {
         btnLogin = (Button) findViewById(R.id.loginButton);
         cbShowPw = (CheckBox) findViewById(R.id.cbShowPassword);
         btnSendMailToHelpdesk = (Button) findViewById(R.id.btnSendMail);
+        btnCallHelpdesk = (Button) findViewById(R.id.btnCallHelpdesk);
 
         mCompaniesSpinner = (Spinner) findViewById(R.id.companySpinner);
         mCompaniesSpinner.setOnItemSelectedListener(
@@ -285,7 +286,7 @@ public class Procurement extends Activity {
 
         gs.setIvKey(sharedPref.getString("IVKey", ""));
         gs.setGcmIdentification(sharedPref.getString("GCMIdentification", ""));
-        gs.setCalmDeviceId(sharedPref.getInt("SAPDeviceId", 0));
+        gs.setCalmDeviceId(sharedPref.getInt("calmDeviceId", 0));
         gs.setUserName(sharedPref.getString("UserName", ""));
         gs.setDomainName(sharedPref.getString("DomainName", ""));
         final String uniqueDeviceID = sharedPref.getString("UniqueDeviceID", "");
@@ -388,10 +389,37 @@ public class Procurement extends Activity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "dutoitd1@proteacoin.co.za", null));
-                i.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ "dutoitd1@proteacoin.co.za" });
+                i.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"dutoitd1@proteacoin.co.za"});
                 i.putExtra(android.content.Intent.EXTRA_SUBJECT, "Android Procurement Mobile Device");
                 i.putExtra(android.content.Intent.EXTRA_TEXT, "");
                 startActivity(Intent.createChooser(i, "Send email"));
+            }
+        }));
+
+        btnCallHelpdesk.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                int pt = tm.getPhoneType();
+                if (pt == TelephonyManager.PHONE_TYPE_NONE) {
+                    new AlertDialog.Builder(Procurement.this)
+                            .setTitle("Call Helpdesk")
+                            .setMessage("Your device cannot make a Phone Call. Please call helpdesk @ (012)665-8000 ext 1100 from another device")
+                            .setIcon(android.R.drawable.ic_dialog_dialer)
+                            .show();
+                } else {
+                    try {
+                        Intent callIntent = new Intent(Intent.ACTION_CALL);
+                        callIntent.setData(Uri.parse("tel:+270818247321"));
+                        startActivity(callIntent);
+                    } catch (Exception e) {
+                        new AlertDialog.Builder(Procurement.this)
+                                .setTitle("Call Helpdesk")
+                                .setMessage("A Phone Call could not be made with your device. Please call helpdesk @ (012)665-8000 ext 1100 from another device")
+                                .setIcon(android.R.drawable.ic_dialog_dialer)
+                                .show();
+                    }
+                }
             }
         }));
 
@@ -542,7 +570,9 @@ public class Procurement extends Activity {
             ServiceHandler sh = new ServiceHandler();
 
             // TODO - Remove hardcoded values
-//            password = "D@n13August";
+            password = "D@n13S3pt3mb3r";
+            gs.setDomainName("pcg");
+            gs.setUserName("dutoitd1");
 
             JSONObject obj = new JSONObject();
             try {
@@ -573,6 +603,8 @@ public class Procurement extends Activity {
 
             String url = GlobalState.LOGIN_URL;
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.POST, queryParams);
+
+//            JSONObject jsonObj;
 
             // Decrypt jsonStr
             String decryptedString;
@@ -610,7 +642,7 @@ public class Procurement extends Activity {
                             SystemApplicationDatabaseIdList.add(i, key);
                             CompanyCodeNameList.add(i, value);
                         }
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         String s = e.getMessage();
                         // Intentially left blank in case the list of companys is empty
                     }
@@ -674,8 +706,7 @@ public class Procurement extends Activity {
                     gs.setUserName(un.getText().toString());
                     edit.putString("DomainName", dn.getText().toString());
                     gs.setDomainName(dn.getText().toString());
-//                    edit.putInt("NumberrOfSecurityIDViews", 99);
-//                    numberrOfSecurityIDViews = 99;
+                    edit.putInt("CalmDeviceId", gs.getCalmDeviceId());
 
                     edit.apply();
 

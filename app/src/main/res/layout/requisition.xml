@@ -12,15 +12,16 @@
             style="@style/H2"
             android:paddingBottom="2dip"
             android:id="@+id/lblRequisitionId"
-            android:text="RequisitionId:"/>
+            android:text="RequisitionId:"
+            android:layout_width="120dp"/>
     <TextView
             style="@style/input_field"
             android:id="@+id/tvRequisitionId"
             android:layout_width="fill_parent"
             android:paddingBottom="2dip"
             android:layout_alignBaseline="@+id/lblRequisitionId"
-            android:text="Requisition ID" android:layout_alignEnd="@+id/tvSupplierCardName"
-            android:layout_alignStart="@+id/tvSupplierCardName"/>
+            android:text="Requisition ID"
+            android:layout_toRightOf="@+id/lblRequisitionId"/>
 
     <!-- SupplierCardCode -->
     <TextView
@@ -28,7 +29,8 @@
             android:paddingBottom="2dip"
             android:id="@+id/lblSupplierCardCode"
             android:layout_below="@+id/lblRequisitionId"
-            android:text="Supplier Code:"/>
+            android:text="Supplier Code:"
+            android:layout_width="120dp"/>
     <TextView
             style="@style/input_field"
             android:id="@+id/tvSupplierCardCode"
@@ -36,7 +38,7 @@
             android:paddingBottom="2dip"
             android:layout_alignBaseline="@+id/lblSupplierCardCode"
             android:text="Supplier Code"
-            android:layout_alignEnd="@+id/tvRequisitionId" android:layout_alignStart="@+id/tvSupplierCardName"/>
+            android:layout_toRightOf="@+id/lblSupplierCardCode"/>
 
     <!-- SupplierCardName -->
     <TextView
@@ -44,7 +46,8 @@
             android:paddingBottom="2dip"
             android:id="@+id/lblSupplierCardName"
             android:layout_below="@+id/lblSupplierCardCode"
-            android:text="Supplier Name:"/>
+            android:text="Supplier Name:"
+            android:layout_width="120dp"/>
     <TextView
             style="@style/input_field"
             android:id="@+id/tvSupplierCardName"

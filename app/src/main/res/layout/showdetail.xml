@@ -3,221 +3,221 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
+
     <ScrollView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/scrollView">
+        android:id="@+id/scrollView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-    <ListView
-            android:id="@+id/listView"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_weight="1"/>
-
-    <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-
-        <TableLayout
+            android:orientation="vertical">
+            <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:stretchColumns="1">
+                android:layout_height="fill_parent">
 
-            <TableRow>
-
-                <TextView
-                        style="@style/H1"
-                        android:text="Supplier Details"
-                        />
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                        android:id="@+id/text1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="3dip"
-                        android:text="  Supplier Name:"></TextView>
-
-                <TextView
-                        android:id="@+id/supp_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:text="Veer" android:lines="1"></TextView>
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="3dip"
-                        android:text="  Contact: "></TextView>
-
-                <TextView
-                        android:id="@+id/supp_contact_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:text="Supplier Contact Name" android:lines="1"></TextView>
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="3dip"
-                        android:text="  Telephone"></TextView>
-
-                <TextView
-                        android:id="@+id/supp_contact_tel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:text="081 824 7321" android:lines="1"></TextView>
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="3dip"
-                        android:text="  E-Mail"></TextView>
-
-                <TextView
-                        android:id="@+id/supp_contact_email"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:text="danie@hotmail.com" android:lines="1"></TextView>
-            </TableRow>
-
-            <TextView
-                    style="@style/H1"
-                    android:text="Requisition Contact Person Details"/>
-
-            <TableRow>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="3dip"
-                        android:text="  Contact"></TextView>
-
-                <TextView
-                        android:id="@+id/req_contact"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:text="Requisition Contact Name" android:lines="1"></TextView>
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="3dip"
-                        android:text="  Telephone"></TextView>
-
-                <TextView
-                        android:id="@+id/req_phone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:text="081 824 7321" android:lines="1"></TextView>
-            </TableRow>
-
-            <TableRow>
-
-                <View style="@style/Divider"/>
-
-                <View style="@style/Divider"/>
-            </TableRow>
-
-            <TableRow>
-
-                <LinearLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_span="2"
-                        android:orientation="horizontal"
-                        android:weightSum="100">
-
-                    <Spinner
-                            android:id="@+id/approveOptions"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="30"
-                            android:spinnerMode="dropdown"
-                            />
-
-                    <Button
-                            android:layout_marginRight="5dp"
-                            android:background="@drawable/buttonshape"
-                            android:textColor="#FFFFFF"
-                            android:textSize="20sp"
-                            android:id="@+id/approveIt"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_column="1"
-                            android:layout_weight="70"
-                            android:text="OK"/>
-
-                </LinearLayout>
-
-            </TableRow>
-
-            <TableRow>
-
-                <LinearLayout
-                        android:id="@+id/approvalContainer"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_span="2"
-                        android:orientation="horizontal">
-
-                </LinearLayout>
-            </TableRow>
-
-            <TableRow
-                    android:dividerHeight="1px">
-
-                <LinearLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_span="2"
-                        android:orientation="horizontal">
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:stretchColumns="1">
 
                     <TextView
-                            style="@style/H2"
-                            android:text="Comment: "/>
+                        style="@style/H2"
+                        android:text="Supplier Details"/>
 
-                    <EditText
-                            android:id="@+id/etComment"
+                    <TableRow>
+
+                        <TextView
+                            android:id="@+id/text1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="3dip"
+                            android:text="  Supplier Name:"/>
+
+                        <TextView
+                            android:id="@+id/supp_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="left"
+                            android:lines="1"
+                            android:text="Veer"/>
+                    </TableRow>
+
+                    <TableRow>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="3dip"
+                            android:text="  Contact: "/>
+
+                        <TextView
+                            android:id="@+id/supp_contact_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="left"
+                            android:lines="1"
+                            android:text="Supplier Contact Name"/>
+                    </TableRow>
+
+                    <TableRow>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="3dip"
+                            android:text="  Telephone"/>
+
+                        <TextView
+                            android:id="@+id/supp_contact_tel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="left"
+                            android:lines="1"
+                            android:text="081 824 7321"/>
+                    </TableRow>
+
+                    <TableRow>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="3dip"
+                            android:text="  E-Mail"/>
+
+                        <TextView
+                            android:id="@+id/supp_contact_email"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="left"
+                            android:lines="1"
+                            android:text="danie@hotmail.com"/>
+                    </TableRow>
+
+                    <TextView
+                        style="@style/H2"
+                        android:text="Requisition Contact Person Details"/>
+
+                    <TableRow>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="3dip"
+                            android:text="  Contact"/>
+
+                        <TextView
+                            android:id="@+id/req_contact"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="left"
+                            android:lines="1"
+                            android:text="Requisition Contact Name"/>
+                    </TableRow>
+
+                    <TableRow>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="3dip"
+                            android:text="  Telephone"/>
+
+                        <TextView
+                            android:id="@+id/req_phone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="left"
+                            android:lines="1"
+                            android:text="081 824 7321"/>
+                    </TableRow>
+
+                    <TableRow>
+
+                        <View style="@style/Divider"/>
+
+                        <View style="@style/Divider"/>
+                    </TableRow>
+
+                    <TableRow>
+
+                        <LinearLayout
                             android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"/>
-                </LinearLayout>
+                            android:layout_height="wrap_content"
+                            android:layout_span="2"
+                            android:orientation="horizontal"
+                            android:weightSum="100">
 
-            </TableRow>
+                            <Spinner
+                                android:id="@+id/approveOptions"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="30"
+                                android:spinnerMode="dropdown"
+                                />
 
-            <TableRow android:layout_width="wrap_content" android:layout_height="wrap_content">
+                            <Button
+                                android:id="@+id/approveIt"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_column="1"
+                                android:layout_marginRight="5dp"
+                                android:layout_weight="70"
+                                android:background="@drawable/buttonshape"
+                                android:text="OK"
+                                android:textColor="#FFFFFF"
+                                android:textSize="20sp"/>
 
-                <LinearLayout
+                        </LinearLayout>
+
+                    </TableRow>
+
+                    <TableRow>
+
+                        <LinearLayout
+                            android:id="@+id/approvalContainer"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_span="2"
+                            android:orientation="horizontal">
+
+                        </LinearLayout>
+                    </TableRow>
+
+                    <TableRow
+                        android:dividerHeight="1px">
+
+                        <LinearLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_span="2"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/H2"
+                                android:text="Comment: "/>
+
+                            <EditText
+                                android:id="@+id/etComment"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"/>
+                        </LinearLayout>
+
+                    </TableRow>
+
+                    <TableRow
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_span="2"
-                        android:orientation="horizontal" android:weightSum="2">
+                        android:layout_height="wrap_content">
 
-                    <!--<Button-->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_span="2"
+                            android:orientation="horizontal"
+                            android:weightSum="2">
+
+                            <!--<Button-->
                             <!--android:layout_marginLeft="5dp"-->
                             <!--android:background="@drawable/buttonshape"-->
                             <!--android:textColor="#FFFFFF"-->
@@ -228,7 +228,7 @@
                             <!--android:dividerHeight="1px"-->
                             <!--android:text="View Requisition Lines"/>-->
 
-                    <!--<Button-->
+                            <!--<Button-->
                             <!--android:layout_marginLeft="5dp"-->
                             <!--android:layout_marginTop="3dp"-->
                             <!--android:background="@drawable/buttonshape"-->
@@ -240,30 +240,31 @@
                             <!--android:dividerHeight="1px"-->
                             <!--android:text="View Attached documents"/>-->
 
-                    <ImageButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/bViewRequisitionLines"
-                            android:adjustViewBounds="true"
-                            android:layout_weight="1"
-                            android:clickable="true"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/requisitionlist"/>
-                    <ImageButton
-                            android:id="@+id/bViewAttachedDocuments"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:adjustViewBounds="true"
-                            android:layout_weight="1"
-                            android:clickable="true"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/attachedocuments"/>
-                </LinearLayout>
-            </TableRow>
-        </TableLayout>
-    </RelativeLayout>
+                            <ImageButton
+                                android:id="@+id/bViewRequisitionLines"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:adjustViewBounds="true"
+                                android:clickable="true"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/requisitionlist"/>
 
-    </LinearLayout>
-</ScrollView>
+                            <ImageButton
+                                android:id="@+id/bViewAttachedDocuments"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:adjustViewBounds="true"
+                                android:clickable="true"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/attachedocuments"/>
+                        </LinearLayout>
+                    </TableRow>
+                </TableLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

@@ -10,12 +10,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -40,20 +42,25 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class GlobalState extends Application {
 
-    public static String APP_TITLE;
     public final static String PROJECT_ID = "564345734817";
     public final static String SYSTEM_APPLICATION_ID = "3";
     public final static String LOGIN_URL = "http://172.24.1.221/CALM/api/mobileApplicationLogin.php";
     //	public final static String INTERNET_URL = "http://172.24.0.239:9001/SAPWebXPHP/Main/AjaxPages/";
-//	public final static String INTERNET_URL = "http://172.24.1.221/SAPWebXPHP/AjaxPages/"; // Brians PC
-    public final static String INTERNET_URL = "http://172.24.0.37/SAPWebXPHP/AjaxPages/"; // QA Server
+    public final static String INTERNET_URL = "http://172.24.1.221/SAPWebXPHP/AjaxPages/"; // Brians PC
+//    public final static String LOGIN_URL = "http://172.24.0.37/CALM/api/mobileApplicationLogin.php"; // CALM Server
     //	public final static IvParameterSpec IV_KEY = new IvParameterSpec(("23342DFA23342DFA").getBytes());
     public final static SecretKeySpec CALM_APPLICATION__KEY = new SecretKeySpec(("8qxRdXT169oH77r8").getBytes(), "AES");
+//    public final static String INTERNET_URL = "http://172.24.0.37/SAPWebXPHP/AjaxPages/"; // QA Server
     public final static long INACTIVE_TIMEOUT = 3 * 60 * 1000; // 3 minutes
+    public static String APP_TITLE;
     private static long startTime;
     private static ActionBar actionBar;
     private static String versionName;
     private static Context context;
+    private static ViewGroup viewGroup;
+    private static TextView actionBarTimeText;
+    private static View actionBarCustomActionBarView;
+    private static LayoutInflater actionBarLayoutInflater;
     private final Random random = new Random();
     private PowerManager.WakeLock wakeLock;
     private String requisitionId;
@@ -76,14 +83,11 @@ public class GlobalState extends Application {
     private SecretKeySpec keyspec;
     private String userFirstName;
     private String userSurName;
-    private static ViewGroup viewGroup;
-    private static TextView actionBarTimeText;
-    private static View actionBarCustomActionBarView;
-    private static LayoutInflater actionBarLayoutInflater;
 
     public static ViewGroup getViewGroup() {
         return viewGroup;
     }
+
     public static void setViewGroup(ViewGroup viewGroup) {
         GlobalState.viewGroup = viewGroup;
     }
@@ -191,31 +195,35 @@ public class GlobalState extends Application {
         }
     }
 
+    public static TextView getActionBarTimeText() {
+        return actionBarTimeText;
+    }
+
     public static void setActionBarTimeText(TextView actionBarTimeText) {
         GlobalState.actionBarTimeText = actionBarTimeText;
     }
-    public static TextView getActionBarTimeText() {
-        return actionBarTimeText;
+
+    public static View getActionBarCustomActionBarView() {
+        return actionBarCustomActionBarView;
     }
 
     public static void setActionBarCustomActionBarView(View actionBarCustomActionBarView) {
         GlobalState.actionBarCustomActionBarView = actionBarCustomActionBarView;
     }
-    public static View getActionBarCustomActionBarView() {
-        return actionBarCustomActionBarView;
+
+    public static LayoutInflater getActionBarLayoutInflater() {
+        return actionBarLayoutInflater;
     }
 
     public static void setActionBarLayoutInflater(LayoutInflater actionBarLayoutInflater) {
         GlobalState.actionBarLayoutInflater = actionBarLayoutInflater;
     }
-    public static LayoutInflater getActionBarLayoutInflater() {
-        return actionBarLayoutInflater;
-    }
 
     public String getUserName() {
         return userName;
     }
-        public void setUserName(String userName) {
+
+    public void setUserName(String userName) {
         this.userName = userName;
     }
 
@@ -239,7 +247,7 @@ public class GlobalState extends Application {
             e.printStackTrace();
         }
 
-        GlobalState.APP_TITLE =  "Procurement V " + GlobalState.getVersionName();
+        GlobalState.APP_TITLE = "Procurement V " + GlobalState.getVersionName();
     }
 
     public String getUniqueDeviceId() {

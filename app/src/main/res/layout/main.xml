@@ -1,162 +1,217 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
               android:orientation="vertical"
-    >
-    <ScrollView android:layout_width="fill_parent" android:layout_height="489dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:id="@+id/scrollView2">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_width="fill_parent"
-                  android:layout_height="fill_parent"
-                  android:orientation="vertical"
-            >
+              android:weightSum="1">
+
     <ImageView
-            android:id="@+id/imageView"
-            android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
-            android:src="@drawable/logo"
-            android:adjustViewBounds="true"/>
-
-    <TextView
-        android:id="@+id/textView"
-        style="@style/H1"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/loginPrompt"
-        android:textSize="21sp"/>
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TableRow
-            android:layout_width="200dip"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
-
-            <TextView
-                style="@style/H2"
-                android:layout_column="0"
-                android:layout_marginLeft="10dp"
-                android:text="@string/companyDomain"
-                android:textSize="17sp"/>
-
-            <EditText
-                android:inputType="text"
-                android:id="@+id/domainName"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
-                style="@style/input_field"/>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp" android:layout_gravity="left">
-
-            <TextView
-                style="@style/H2"
-                android:layout_column="0"
-                android:layout_marginLeft="10dp"
-                android:text="@string/userName"
-                android:textSize="17sp"/>
-
-            <EditText
-                android:inputType="text"
-                android:id="@+id/uName"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
-                style="@style/input_field"/>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
-
-            <TextView
-                style="@style/H2"
-                android:layout_column="0"
-                android:layout_marginLeft="10dp"
-                android:text="@string/password"
-                android:textSize="17sp"/>
-
-            <EditText
-                style="@style/input_field"
-                android:id="@+id/password"
-                android:layout_column="1"
-                android:inputType="textPassword"
-                android:layout_width="200dp"
-                android:layout_marginLeft="15dp"/>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
-
-            <CheckBox
-                android:layout_column="0"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Show Password"
-                android:id="@+id/cbShowPassword"
-                android:checked="false"/>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp" android:layout_gravity="left"
-            android:id="@+id/companyRow"
-            android:visibility="gone">
-
-            <TextView
-                style="@style/H2"
-                android:layout_column="0"
-                android:layout_marginLeft="10dp"
-                android:text="Company:"
-                android:textSize="17sp"/>
-
-            <Spinner
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/companySpinner"
-                android:layout_column="1"
-                android:layout_marginLeft="15dp"
-                android:spinnerMode="dropdown"/>
-
-        </TableRow>
-
-    </TableLayout>
-
-
-        <Button
-        style="@style/button"
-        android:id="@+id/loginButton"
-        android:layout_width="150sp"
-        android:background="@drawable/buttonshape"
-        android:text="@string/login"/>
-
-    <TextView
-        android:id="@+id/tv_error"
-        style="@style/errorView"/>
-        </LinearLayout>
-    </ScrollView>
-
-    <Button
+        android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Send e-mail to helpdesk"
-        android:id="@+id/btnSendMail"
-        android:clickable="true"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        style="@android:style/Widget.ActionButton.Overflow"/>
+        android:adjustViewBounds="false"
+        android:src="@drawable/logo"/>
+    <HorizontalScrollView
+        android:id="@+id/horizontalScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:id="@+id/scrollView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fillViewport="false"
+            android:nestedScrollingEnabled="false">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/rlLogin"
+                >
+
+                <TextView
+                    android:id="@+id/tvLoginPrompt"
+                    style="@style/H1"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/loginPrompt"
+                    android:textSize="21sp"
+                    android:layout_alignParentStart="false"
+                    android:layout_alignParentEnd="false"
+                    />
+
+                <TextView
+                    style="@style/H2"
+                    android:layout_column="0"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/companyDomain"
+                    android:textSize="17sp"
+                    android:id="@+id/tvDomain"
+                    android:layout_alignLeft="@+id/tvLoginPrompt"
+                    android:layout_below="@+id/tvLoginPrompt"
+                    android:layout_width="130dp"
+                    android:layout_marginTop="10dp"/>
+
+                <EditText
+                    android:id="@+id/domainName"
+                    style="@style/input_field"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:inputType="text"
+                    android:layout_toRightOf="@+id/tvDomain"
+                    android:layout_alignBaseline="@+id/tvDomain"
+                    android:layout_alignParentRight="false"/>
+
+                <TextView
+                    style="@style/H2"
+                    android:layout_column="0"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/userName"
+                    android:textSize="17sp"
+                    android:layout_alignStart="@id/tvLoginPrompt"
+                    android:id="@+id/tvUserName"
+                    android:layout_width="130dp"
+                    android:layout_below="@+id/tvDomain"
+                    android:layout_marginTop="10dp"/>
+
+                <EditText
+                    android:id="@+id/uName"
+                    style="@style/input_field"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:inputType="text"
+                    android:layout_toEndOf="@id/tvUserName"
+                    android:layout_alignTop="@+id/tvUserName"
+                    android:layout_alignBaseline="@+id/tvUserName"
+                    android:layout_alignParentRight="false"/>
+
+                <TextView
+                    style="@style/H2"
+                    android:layout_column="0"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/password"
+                    android:textSize="17sp"
+                    android:id="@+id/tvPassword"
+                    android:layout_alignLeft="@+id/tvLoginPrompt"
+                    android:layout_below="@+id/tvUserName"
+                    android:layout_width="130dp"
+                    android:layout_marginTop="10dp"/>
+
+                <EditText
+                    android:id="@+id/password"
+                    style="@style/input_field"
+                    android:layout_width="200dp"
+                    android:layout_column="1"
+                    android:layout_marginLeft="15dp"
+                    android:inputType="textPassword"
+                    android:layout_toRightOf="@+id/tvPassword"
+                    android:layout_alignBaseline="@+id/tvPassword"
+                    android:layout_alignParentRight="false"
+                    android:layout_alignParentLeft="false"/>
+
+                <CheckBox
+                    android:id="@+id/cbShowPassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:checked="false"
+                    android:text="Show Password"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_below="@+id/tvPassword"
+                    android:layout_alignLeft="@+id/tvLoginPrompt"/>
+
+                <TableRow
+                    android:id="@+id/companyRow"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginTop="10dp"
+                    android:visibility="gone"
+                    android:layout_alignLeft="@+id/tvLoginPrompt"
+                    android:layout_below="@+id/cbShowPassword">
+
+                    <TextView
+                        style="@style/H2"
+                        android:layout_width="130dp"
+                        android:layout_column="0"
+                        android:layout_marginLeft="10dp"
+                        android:text="Company:"
+                        android:textSize="17sp"
+                        android:id="@+id/tvCompany"
+                        android:layout_below="@+id/cbShowPassword"/>
+
+                    <Spinner
+                        android:id="@+id/companySpinner"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_column="1"
+                        android:layout_marginLeft="15dp"
+                        android:spinnerMode="dropdown"
+                        android:layout_toRightOf="@+id/tvCompany"
+                        android:layout_alignBaseline="@+id/tvCompany"/>
+                </TableRow>
+
+                <TextView
+                    android:id="@+id/tv_error"
+                    style="@style/errorView"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:lines="3"
+                    android:layout_below="@+id/loginButton"
+                    android:layout_alignLeft="@+id/tvLoginPrompt"/>
+
+                <Button
+                    android:id="@+id/btnSendMail"
+                    style="@android:style/Widget.ActionButton.Overflow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:text="Send e-mail to helpdesk"
+                    android:layout_below="@+id/loginButton"/>
+
+                <Button
+                    android:id="@+id/loginButton"
+                    style="@style/button"
+                    android:layout_width="150sp"
+                    android:background="@drawable/buttonshape"
+                    android:text="@string/login"
+                    android:layout_below="@+id/companyRow"
+                    android:gravity="center"
+                    android:layout_alignParentBottom="false"
+                    android:layout_alignParentRight="false"
+                    android:layout_alignWithParentIfMissing="false"
+                    android:layout_centerHorizontal="true"/>
+
+                <Button
+                    android:id="@+id/btnCallHelpdesk"
+                    style="@android:style/Widget.ActionButton.Overflow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:text="Call helpdesk"
+                    android:layout_toRightOf="@+id/btnSendMail"
+                    android:layout_alignBaseline="@+id/btnSendMail"/>
+
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                              android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:orientation="vertical"
+                    >
 
 
-</RelativeLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
 
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+        </ScrollView>
+    </HorizontalScrollView>
+
+</LinearLayout>

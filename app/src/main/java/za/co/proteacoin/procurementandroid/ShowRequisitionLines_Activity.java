@@ -12,20 +12,24 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.widget.ListAdapter;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class ShowRequisitionLines_Activity extends ListActivity {
     private static final String TAG_LINENUMBER = "LineNumber";
     private static final String TAG_ITEMDESCRIPTION = "ItemDescription";
-    private static final String TAG_ACCTCODE = "AcctCode";
+    private static final String TAG_ACCTNAME = "AcctName";
     private static final String TAG_QUANTITY = "Quantity";
     private static final String TAG_LINETOTAL = "LineTotal";
     private static final String TAG_DATA = "requisitionLines";
@@ -164,7 +168,7 @@ public class ShowRequisitionLines_Activity extends ListActivity {
                         JSONObject c = data.getJSONObject(i);
                         String lineNUmber = c.getString(TAG_LINENUMBER);
                         String itemDescription = c.getString(TAG_ITEMDESCRIPTION);
-                        String acctCode = c.getString(TAG_ACCTCODE);
+                        String acctCode = c.getString(TAG_ACCTNAME);
                         String quantity = c.getString(TAG_QUANTITY);
                         String lineTotal = c.getString(TAG_LINETOTAL);
 
@@ -174,17 +178,24 @@ public class ShowRequisitionLines_Activity extends ListActivity {
                         // adding each child node to HashMap key => value
                         hm.put(TAG_LINENUMBER, lineNUmber);
                         hm.put(TAG_ITEMDESCRIPTION, itemDescription);
-                        hm.put(TAG_ACCTCODE, acctCode);
-                        double dbl = Double.valueOf(quantity);
-                        hm.put(TAG_QUANTITY, gs.toDouble(dbl, false));
+                        hm.put(TAG_ACCTNAME, acctCode);
+
+                        String pattern = "#,###.00";
+                        DecimalFormat decimalFormat = new DecimalFormat(pattern);
+                        double dbl;
                         try {
                             dbl = Double.valueOf(lineTotal);
+                            lineTotal = decimalFormat.format(dbl);
+                            totalValue += dbl;
+
+                            dbl = Double.valueOf(quantity);
+                            quantity = decimalFormat.format(dbl);
                         } catch (Exception e) {
                             continue;
                         }
-                        hm.put(TAG_LINETOTAL, gs.toDouble(dbl, true));
+                        hm.put(TAG_LINETOTAL, lineTotal);
+                        hm.put(TAG_QUANTITY, quantity);
 
-                        totalValue += dbl;
 
                         // adding requisition line to requisitionLinesList
                         requisitionLinesList.add(hm);
@@ -240,7 +251,7 @@ public class ShowRequisitionLines_Activity extends ListActivity {
                         R.layout.requisition_line,
                         new String[]{TAG_LINENUMBER,
                                 TAG_ITEMDESCRIPTION,
-                                TAG_ACCTCODE,
+                                TAG_ACCTNAME,
                                 TAG_QUANTITY,
                                 TAG_LINETOTAL},
                         new int[]{R.id.tvLineNumber,
@@ -251,7 +262,11 @@ public class ShowRequisitionLines_Activity extends ListActivity {
 
                 setListAdapter(adapter);
                 if (getActionBar() != null) {
-                    getActionBar().setTitle("Requisition #" + gs.getRequisitionId() + " TOTAL: " + gs.toDouble(totalValue, true));
+                    String pattern = "#,###.00";
+                    DecimalFormat decimalFormat = new DecimalFormat(pattern);
+                    String tv = decimalFormat.format(totalValue);
+
+                    getActionBar().setTitle("Requisition #" + gs.getRequisitionId() + " TOTAL: R" + tv);
                 }
             }
         }
