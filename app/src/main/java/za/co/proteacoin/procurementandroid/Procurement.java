@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -57,7 +58,6 @@ public class Procurement extends Activity {
     private final String TAG = "MAIN";
     GoogleCloudMessaging gcm;
     private Handler mHandler = new Handler();
-    private TableRow trCompanyRow;
     private boolean loginSuccessFull = false;
     private SharedPreferences sharedPref;
     private int numberrOfSecurityIDViews = -1;
@@ -66,6 +66,7 @@ public class Procurement extends Activity {
     private EditText pw, dn, un;
     private TextView error;
     private GlobalState gs;
+    private LinearLayout llCompany;
     // Create a broadcast receiver to get message and show on screen
     private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
 
@@ -170,7 +171,7 @@ public class Procurement extends Activity {
     protected void onResume() {
         super.onResume();
         pw.setText("");
-        trCompanyRow.setVisibility(View.GONE);
+        llCompany.setVisibility(View.GONE);
         loginSuccessFull = false;
         btnLogin.setText("Login");
         mHandler.removeCallbacksAndMessages(null);
@@ -181,7 +182,7 @@ public class Procurement extends Activity {
         super.onRestart();
         pw.setText("");
         error.setText("");
-        trCompanyRow.setVisibility(View.GONE);
+        llCompany.setVisibility(View.GONE);
         loginSuccessFull = false;
         btnLogin.setText("Login");
         mHandler.removeCallbacksAndMessages(null);
@@ -231,9 +232,9 @@ public class Procurement extends Activity {
 
         gs = (GlobalState) getApplication();
 
-        trCompanyRow = (TableRow) findViewById(R.id.companyRow);
+        llCompany = (LinearLayout) findViewById(R.id.llCompany);
         // Hide the company row because we will only need it to be visible after a successfull login
-        trCompanyRow.setVisibility(View.INVISIBLE);
+        llCompany.setVisibility(View.INVISIBLE);
         un = (EditText) findViewById(R.id.uName);
         pw = (EditText) findViewById(R.id.password);
         dn = (EditText) findViewById(R.id.domainName);
@@ -490,21 +491,29 @@ public class Procurement extends Activity {
         switch (item.getItemId()) {
             case R.id.showIVKey:
                 // If the device has already been registered with the company then return
-//                if (gs.getCalmDeviceId() > 0) {
-//                    gs.showAlertDialog(Procurement.this, "Security Code", "You have already registered this device. ID: " + gs.getCalmDeviceId(), true);
-//                    return true;
-//                }
+                if (gs.getCalmDeviceId() > 0) {
+                    gs.showAlertDialog(Procurement.this, "Security Code", "You have already registered this device. ID: " + gs.getCalmDeviceId(), true);
+                    return true;
+                }
+                numberrOfSecurityIDViews++;
+                if (numberrOfSecurityIDViews >= GlobalState.NUMBER_OF_SECURITY_ID_VIEWS + 1)
+                    numberrOfSecurityIDViews = GlobalState.NUMBER_OF_SECURITY_ID_VIEWS + 1;
+                // Create editor for editing Preferences
+                SharedPreferences.Editor edit = sharedPref.edit();
+                edit.putInt("numberrOfSecurityIDViews", numberrOfSecurityIDViews);
+                edit.apply();
+
                 // TODO Remove the below
-                if (++numberrOfSecurityIDViews > 4) {
+                if (numberrOfSecurityIDViews > GlobalState.NUMBER_OF_SECURITY_ID_VIEWS) {
                     gs.showAlertDialog(Procurement.this, "Security Code", "You have reached your maximum allowed chances to view yout Security code", false);
                 } else {
-                    String msg = "You have only " + (4 - numberrOfSecurityIDViews) + " chance left to view your Security Code";
+                    String msg = "You have only " + (GlobalState.NUMBER_OF_SECURITY_ID_VIEWS - numberrOfSecurityIDViews) + " chance left to view your Security Code";
                     new AlertDialog.Builder(Procurement.this)
                             .setTitle("Security Code")
                             .setMessage(msg)
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Intent i = new Intent("android.intent.action.CompanyInit_Activity");
+                                    Intent i = new Intent(getApplicationContext(), CompanyInit_Activity.class);
                                     startActivityForResult(i, 2);
                                 }
                             })
@@ -513,6 +522,7 @@ public class Procurement extends Activity {
                 }
                 return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -711,7 +721,7 @@ public class Procurement extends Activity {
                     edit.apply();
 
                     mCompaniesSpinner.setAdapter(new ArrayAdapter<String>(Procurement.this, android.R.layout.simple_spinner_dropdown_item, CompanyCodeNameList));
-                    trCompanyRow.setVisibility(View.VISIBLE);
+                    llCompany.setVisibility(View.VISIBLE);
                 } else {
                     btnLogin.setText("Login");
                     error.setText("Invalid username or password.");

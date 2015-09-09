@@ -1,56 +1,57 @@
 package za.co.proteacoin.procurementandroid;
 
 import android.app.ActionBar;
-import android.app.AlertDialog;
-import android.app.Application;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
-import android.os.PowerManager;
-import android.provider.Settings;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+        import android.app.AlertDialog;
+        import android.app.Application;
+        import android.content.Context;
+        import android.content.DialogInterface;
+        import android.content.Intent;
+        import android.content.pm.PackageInfo;
+        import android.content.pm.PackageManager;
+        import android.net.ConnectivityManager;
+        import android.net.NetworkInfo;
+        import android.net.Uri;
+        import android.os.PowerManager;
+        import android.provider.Settings;
+        import android.util.Log;
+        import android.view.LayoutInflater;
+        import android.view.View;
+        import android.view.ViewGroup;
+        import android.widget.LinearLayout;
+        import android.widget.TextView;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.NoSuchAlgorithmException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
+        import java.io.IOException;
+        import java.io.OutputStream;
+        import java.net.HttpURLConnection;
+        import java.net.MalformedURLException;
+        import java.net.URL;
+        import java.security.NoSuchAlgorithmException;
+        import java.text.DecimalFormat;
+        import java.text.DecimalFormatSymbols;
+        import java.util.ArrayList;
+        import java.util.Currency;
+        import java.util.HashMap;
+        import java.util.Iterator;
+        import java.util.Locale;
+        import java.util.Map;
+        import java.util.Random;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+        import javax.crypto.Cipher;
+        import javax.crypto.spec.IvParameterSpec;
+        import javax.crypto.spec.SecretKeySpec;
 
 public class GlobalState extends Application {
 
+    public final static Integer NUMBER_OF_SECURITY_ID_VIEWS = 4;
     public final static String PROJECT_ID = "564345734817";
     public final static String SYSTEM_APPLICATION_ID = "3";
     public final static String LOGIN_URL = "http://172.24.1.221/CALM/api/mobileApplicationLogin.php";
     //	public final static String INTERNET_URL = "http://172.24.0.239:9001/SAPWebXPHP/Main/AjaxPages/";
     public final static String INTERNET_URL = "http://172.24.1.221/SAPWebXPHP/AjaxPages/"; // Brians PC
-//    public final static String LOGIN_URL = "http://172.24.0.37/CALM/api/mobileApplicationLogin.php"; // CALM Server
+    //    public final static String LOGIN_URL = "http://172.24.0.37/CALM/api/mobileApplicationLogin.php"; // CALM Server
     //	public final static IvParameterSpec IV_KEY = new IvParameterSpec(("23342DFA23342DFA").getBytes());
     public final static SecretKeySpec CALM_APPLICATION__KEY = new SecretKeySpec(("8qxRdXT169oH77r8").getBytes(), "AES");
-//    public final static String INTERNET_URL = "http://172.24.0.37/SAPWebXPHP/AjaxPages/"; // QA Server
+    //    public final static String INTERNET_URL = "http://172.24.0.37/SAPWebXPHP/AjaxPages/"; // QA Server
     public final static long INACTIVE_TIMEOUT = 3 * 60 * 1000; // 3 minutes
     public static String APP_TITLE;
     private static long startTime;
@@ -74,7 +75,7 @@ public class GlobalState extends Application {
     private String commonUserId;
     private String userName;
     private String domainName;
-    private String uniqueDeviceId;
+    public static String uniqueDeviceId;
     private String gcmIdentification;
     private String ivKey;
     private int CalmDeviceId;

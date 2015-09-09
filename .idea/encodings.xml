@@ -15,8 +15,6 @@
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/requisitionlist.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/attached_document_line.xml" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/main.xml" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/mylist.xml" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/myprogressdialog.xml" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/requisition.xml" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/requisition_line.xml" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/show_attached_document_lines.xml" charset="windows-1252" />
